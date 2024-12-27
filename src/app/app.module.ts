@@ -25,7 +25,7 @@ import { FontsComponent } from './components/fonts/fonts.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { StringManipulatorComponent } from './components/string-manipulator/string-manipulator.component';
+import { StringManipulatorComponent } from './components/data-manipulator/string-manipulator.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { AlertModule } from 'ngx-bootstrap/alert';
 
