@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { countries } from '../../constants/countries';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { WorldTimeService } from '../../services/world-service.service';
@@ -11,7 +11,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   styleUrls: ['./world-clock.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush // Optimize change detection
 })
-export class WorldClockComponent implements OnInit {
+export class WorldClockComponent implements OnInit, OnDestroy {
   countries = countries;
   selectedCountryCode: string = '';
   errorMessage: string = '';
@@ -24,6 +24,7 @@ export class WorldClockComponent implements OnInit {
   isLargeScreen: boolean = false;
 
   private countryChangeSubject = new Subject<string>();
+  private intervalId: any; // Store the interval ID
 
   constructor(
     private worldTimeService: WorldTimeService,
@@ -43,6 +44,13 @@ export class WorldClockComponent implements OnInit {
     ).subscribe(countryCode => {
       this.fetchTime(countryCode);
     });
+  }
+
+  ngOnDestroy() {
+    // Clear the interval when the component is destroyed
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   }
 
   onCountryChange() {
@@ -87,7 +95,13 @@ export class WorldClockComponent implements OnInit {
   }
 
   startClock() {
-    setInterval(() => {
+    // Clear the existing interval if it exists
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+
+    // Start a new interval
+    this.intervalId = setInterval(() => {
       this.seconds++;
       if (this.seconds === 60) {
         this.seconds = 0;
