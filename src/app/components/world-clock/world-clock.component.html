@@ -14,34 +14,42 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-  
-      <div *ngIf="currentTime" class="clock-container">
-        <p class="year">Year: {{ currentTime.year }}</p>
-        <div class="clock">
-          <div
-            class="hour-hand"
-            [style.transform]="'rotate(' + getHourRotation(currentTime.time) + 'deg)'"
-          ></div>
-          <div
-            class="minute-hand"
-            [style.transform]="'rotate(' + getMinuteRotation(currentTime.time) + 'deg)'"
-          ></div>
-          <div
-            class="second-hand"
-            [style.transform]="'rotate(' + getSecondRotation(currentTime.time) + 'deg)'"
-          ></div>
-          <div class="hour-markers">
-            <div class="hour-marker" *ngFor="let hour of hourMarkers"></div>
-          </div>
-          <div class="minute-markers">
-            <div class="minute-marker" *ngFor="let minute of minuteMarkers"></div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        <p>{{ errorMessage }}</p>
+      </div>
+
+      <div *ngIf="!errorMessage && selectedCountryCode">
+        <div class="clock-container">
+          <div class="clock">
+            <!-- Clock Numbers -->
+            <div class="number number-1">1</div>
+            <div class="number number-2">2</div>
+            <div class="number number-3">3</div>
+            <div class="number number-4">4</div>
+            <div class="number number-5">5</div>
+            <div class="number number-6">6</div>
+            <div class="number number-7">7</div>
+            <div class="number number-8">8</div>
+            <div class="number number-9">9</div>
+            <div class="number number-10">10</div>
+            <div class="number number-11">11</div>
+            <div class="number number-12">12</div>
+
+            <!-- Clock Hands -->
+            <div class="hour-hand" [style.transform]="getHourRotation()"></div>
+            <div class="minute-hand" [style.transform]="getMinuteRotation()"></div>
+            <div class="second-hand" [style.transform]="getSecondRotation()"></div>
           </div>
         </div>
-  
-        <p class="timezone"><b>Time:</b> {{ currentTime.time }}</p>
-        <p class="timezone"><b>Timezone</b>: {{ currentTime.timezone }}</p>
+
+        <!-- Display Time in Text Format -->
+        <div class="time-text">
+          <p><b>Current Time:</b> {{ getFormattedTime() }}</p>
+        </div>
+
+        <p class="timezone"><b>Timezone:</b> {{ timezone }}</p>
       </div>
     </div>
   </div>
-  
 </div>
