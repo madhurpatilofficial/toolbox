@@ -28,6 +28,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { StringManipulatorComponent } from './components/data-manipulator/string-manipulator.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { AlertModule } from 'ngx-bootstrap/alert';
+import { WeatherComponent } from './components/weather/weather.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -45,6 +49,7 @@ import { AlertModule } from 'ngx-bootstrap/alert';
     FontsComponent,
     CountriesComponent,
     StringManipulatorComponent,
+    WeatherComponent
   ],
   imports: [
     BrowserModule,
@@ -61,6 +66,10 @@ import { AlertModule } from 'ngx-bootstrap/alert';
     MatNativeDateModule,
     ReactiveFormsModule,
     MatToolbarModule,
+    NgxChartsModule,
+
+    MatIconModule,
+    NgxMatSelectSearchModule,
     AlertModule.forRoot(),
   ],
   providers: [WorldTimeService],

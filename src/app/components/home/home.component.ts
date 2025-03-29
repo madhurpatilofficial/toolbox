@@ -15,9 +15,9 @@ export class HomeComponent implements OnInit {
   calculatormessage: string = "Perform basic and advanced calculations with our user-friendly calculator"
   population: string = "Find out the population of the country with data analysis"
   agecalculator: string = "Find out the age according to your age"
-  fontconverter: string  = "Convert your normal tect to amazing fonts"
+  fontconverter: string  = "Convert your normal text to amazing fonts"
   dataManipulator: string = "Perform over 40 different operations, including encoding, decoding, string transformations and many more"
-
+ weatherinfo: string = "Check weather info"
   constructor() { }
 
   ngOnInit(): void {

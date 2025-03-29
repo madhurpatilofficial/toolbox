@@ -1,27 +1,42 @@
-<div class="calculator-container">
-  <div *ngIf="isLargeScreen" class="calculator-title mat-card mat-elevation-z4">
-    <div class="mat-card-content">
-      Calculator
-    </div>
-  </div>
-  <div class="calculator" [ngClass]="{'small-screen': isSmallScreen}" style="margin-top: 5rem">
-    <div class="input-display">
-      <div class="input-box">
-        <label for="input" class="label">Input</label>
-        <div class="input">{{ currentInput }}</div>
+<div class="calculator-wrapper">
+  <div class="calculator-container" [ngClass]="{'small-screen': isSmallScreen}">
+
+    
+    <div class="calculator-body">
+      <div class="display-container">
+        <div class="input-display">
+          <div class="input">{{ currentInput || '0' }}</div>
+        </div>
+        <div class="output-display">
+          <div class="output">{{ result || '0' }}</div>
+        </div>
       </div>
-    </div>
-    <div class="output-display">
-      <div class="output-box">
-        <label for="output" class="label">Output</label>
-        <div class="output">{{ result }}</div>
+
+      <div class="buttons-container">
+        <button 
+          *ngFor="let button of calculatorButtons" 
+          (click)="handleButtonClick(button.value, button.type)"
+          [ngClass]="[
+            'calculator-button',
+            'button-' + button.type,
+            button.value === '=' ? 'button-equals' : ''
+          ]"
+        >
+          {{ button.label }}
+        </button>
       </div>
     </div>
 
-    <div class="buttons">
-      <button *ngFor="let button of calculatorButtons" (click)="handleButtonClick(button.value)">
-        {{ button.label }}
-      </button>
+    <div *ngIf="isLargeScreen && history.length > 0" class="history-container">
+      <div class="history-header">
+        <h3>History</h3>
+        <button class="clear-history-btn" (click)="clearHistory()">Clear</button>
+      </div>
+      <div class="history-list">
+        <div *ngFor="let item of history.slice(0, 5)" class="history-item">
+          {{ item }}
+        </div>
+      </div>
     </div>
   </div>
 </div>

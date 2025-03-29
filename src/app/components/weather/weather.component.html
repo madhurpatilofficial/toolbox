@@ -1,0 +1,115 @@
+<div class="weather-container">
+  <div class="card">
+    <div class="card-header">
+      <h1 class="title">Weather Forecast</h1>
+      <div class="location-selection">
+        <div class="select-container">
+          <mat-form-field appearance="fill" class="location-field">
+            <mat-label>Country</mat-label>
+            <mat-select [(ngModel)]="selectedCountry" (selectionChange)="onCountryChange()">
+              <mat-option [value]="" disabled>Select a country</mat-option>
+              <mat-option *ngFor="let country of countries" [value]="country">{{ country }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="fill" class="location-field">
+            <mat-label>City</mat-label>
+            <mat-select [(ngModel)]="selectedCity" [disabled]="!selectedCountry">
+              <mat-option [value]="" disabled>Select a city</mat-option>
+              <mat-option *ngFor="let city of cities" [value]="city">{{ city }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <button mat-raised-button color="primary" class="get-weather-btn" (click)="getWeather()" [disabled]="!selectedCity">
+            <mat-icon>search</mat-icon> Get Weather
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      <mat-icon>error</mat-icon> {{ error }}
+    </div>
+
+    <div *ngIf="weatherData" class="weather-data">
+      <div class="current-weather">
+        <div class="weather-icon">
+          <span [innerHTML]="getWeatherIcon()"></span>
+        </div>
+        <div class="weather-main">
+          <h2>{{ selectedCity }}, {{ selectedCountry }}</h2>
+          <div class="temperature">{{ weatherData.temperature }}<span>°C</span></div>
+          <div class="description">{{ weatherData.description }}</div>
+          <div class="feels-like">Feels like {{ weatherData.feelsLike }}°C</div>
+        </div>
+      </div>
+      
+      <div class="weather-details">
+        <div class="detail-item">
+          <div class="detail-icon"><mat-icon>opacity</mat-icon></div>
+          <div class="detail-info">
+            <div class="detail-label">Humidity</div>
+            <div class="detail-value">{{ weatherData.humidity }}%</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon"><mat-icon>air</mat-icon></div>
+          <div class="detail-info">
+            <div class="detail-label">Wind Speed</div>
+            <div class="detail-value">{{ weatherData.windSpeed }} km/h</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon"><mat-icon>wb_sunny</mat-icon></div>
+          <div class="detail-info">
+            <div class="detail-label">UV Index</div>
+            <div class="detail-value">{{ weatherData.uvIndex }}</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon"><mat-icon>brightness_5</mat-icon></div>
+          <div class="detail-info">
+            <div class="detail-label">Sunrise</div>
+            <div class="detail-value">{{ weatherData.sunrise }}</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon"><mat-icon>brightness_4</mat-icon></div>
+          <div class="detail-info">
+            <div class="detail-label">Sunset</div>
+            <div class="detail-value">{{ weatherData.sunset }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h3>Weather Metrics</h3>
+        <div class="chart-container">
+          <ngx-charts-bar-vertical
+            [results]="chartData"
+            [scheme]="colorScheme"
+            [gradient]="true"
+            [xAxis]="true"
+            [yAxis]="true"
+            [legend]="false"
+            [showDataLabel]="true"
+            [view]="chartView">
+          </ngx-charts-bar-vertical>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="!weatherData && !error" class="placeholder">
+      <div class="placeholder-icon">
+        <mat-icon class="large-icon">cloud</mat-icon>
+      </div>
+      <div class="placeholder-text">
+        Select a location and click "Get Weather" to see the forecast
+      </div>
+    </div>
+  </div>
+</div>

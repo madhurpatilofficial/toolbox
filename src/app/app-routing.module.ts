@@ -11,6 +11,7 @@ import { AgeCalculatorComponent } from './components/age-calculator/age-calculat
 import { CountriesComponent } from './components/countries/countries.component';
 import { FontsComponent } from './components/fonts/fonts.component';
 import { StringManipulatorComponent } from './components/data-manipulator/string-manipulator.component';
+import { WeatherComponent } from './components/weather/weather.component';
 
 const routes: Routes = [
   {
@@ -56,6 +57,10 @@ const routes: Routes = [
   {
     path: 'data-manipulation',
     component: StringManipulatorComponent
+  },
+  {
+    path: 'weather-service',
+    component: WeatherComponent
   }
 ];
 
