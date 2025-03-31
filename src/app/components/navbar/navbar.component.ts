@@ -1,5 +1,3 @@
-// navbar.component.ts
-
 import { Component, HostListener, OnInit } from '@angular/core';
 
 @Component({
@@ -8,28 +6,28 @@ import { Component, HostListener, OnInit } from '@angular/core';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
-  isMenuVisible = false;
-  menuIconActive = false;
+  isMenuOpen = false;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
-    
     this.checkScreenSize();
   }
 
-  toggleMenu() {
-    this.isMenuVisible = !this.isMenuVisible;
-    this.menuIconActive = this.isMenuVisible;
-    
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen = false;
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
+  onResize(event: Event): void {
     this.checkScreenSize();
   }
 
-  private checkScreenSize() {
-    this.isMenuVisible = window.innerWidth <= 600;
+  private checkScreenSize(): void {
+    this.isMenuOpen = window.innerWidth > 768 && this.isMenuOpen;
   }
 }

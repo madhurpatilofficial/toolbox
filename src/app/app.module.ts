@@ -67,7 +67,6 @@ import { MatIconModule } from '@angular/material/icon';
     ReactiveFormsModule,
     MatToolbarModule,
     NgxChartsModule,
-
     MatIconModule,
     NgxMatSelectSearchModule,
     AlertModule.forRoot(),

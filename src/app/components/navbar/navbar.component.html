@@ -1,57 +1,25 @@
 <nav class="navbar">
   <div class="brand-container">
-    <div class="brand" routerLink="" routerLinkActive="active">ToolBox</div>
-
-    <div
-      class="menu-icon"
-      [class.active]="menuIconActive"
-      (click)="toggleMenu()"
-    >
-      ☰
-    </div>
+    <a class="brand" routerLink="/" routerLinkActive="active">ToolBox</a>
+    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle menu">
+      <span class="menu-icon" [class.open]="isMenuOpen"></span>
+    </button>
   </div>
-  <ul *ngIf="!isMenuVisible">
-    <li><a routerLink="" routerLinkActive="active">Home</a></li>
-    <li>
-      <a routerLink="calculator" routerLinkActive="active">Calculator</a>
-    </li>
-    <li>
-      <a routerLink="age-calculator" routerLinkActive="active"
-        >Age Calculator</a
-      >
-    </li>
-    <li>
-      <a routerLink="currencyconverter" routerLinkActive="active"
-        >Currency Converter</a
-      >
-    </li>
-    <li>
-      <a routerLink="findcapital" routerLinkActive="active">Find Capital</a>
-    </li>
-    <li>
-      <a routerLink="colorpicker" routerLinkActive="active">Color Picker</a>
-    </li>
-    <li>
-      <a routerLink="findflag" routerLinkActive="active">Find Flag</a>
-    </li>
-    <li>
-      <a routerLink="worldclock" routerLinkActive="active">World Clock</a>
-    </li>
-    <li>
-      <a routerLink="population" routerLinkActive="active">Find Population</a>
-    </li>
-    <li>
-      <a routerLink="data-manipulation" routerLinkActive="active"
-        >Data Manipulation</a
-      >
-    </li>
-    <li>
-      <a routerLink="fontconverter" routerLinkActive="active">Font Converter</a>
-    </li>
-    <li>
-      <a routerLink="weather-service" routerLinkActive="active">Weather Service</a>
-    </li>
+  <ul class="nav-links" [class.open]="isMenuOpen">
+    <li><a routerLink="/" routerLinkActive="active" (click)="closeMenu()">Home</a></li>
+    <li><a routerLink="calculator" routerLinkActive="active" (click)="closeMenu()">Calculator</a></li>
+    <li><a routerLink="age-calculator" routerLinkActive="active" (click)="closeMenu()">Age Calculator</a></li>
+    <li><a routerLink="currencyconverter" routerLinkActive="active" (click)="closeMenu()">Currency Converter</a></li>
+    <li><a routerLink="findcapital" routerLinkActive="active" (click)="closeMenu()">Find Capital</a></li>
+    <li><a routerLink="colorpicker" routerLinkActive="active" (click)="closeMenu()">Color Picker</a></li>
+    <li><a routerLink="findflag" routerLinkActive="active" (click)="closeMenu()">Find Flag</a></li>
+    <li><a routerLink="worldclock" routerLinkActive="active" (click)="closeMenu()">World Clock</a></li>
+    <li><a routerLink="population" routerLinkActive="active" (click)="closeMenu()">Find Population</a></li>
+    <li><a routerLink="data-manipulation" routerLinkActive="active" (click)="closeMenu()">Data Manipulation</a></li>
+    <li><a routerLink="fontconverter" routerLinkActive="active" (click)="closeMenu()">Font Converter</a></li>
+    <li><a routerLink="weather-service" routerLinkActive="active" (click)="closeMenu()">Weather Service</a></li>
   </ul>
+  <div class="overlay" [class.active]="isMenuOpen" (click)="closeMenu()"></div>
 </nav>
 <router-outlet></router-outlet>
 <app-footer></app-footer>

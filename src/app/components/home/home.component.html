@@ -1,122 +1,53 @@
-<div class="home-container" routerLink="calculator" routerLinkActive="active">
-  <div class="service">
-    <img
-      src="./assets/calculatorImage.png"
-      alt="Calculator Image"
-      loading="lazy"
-    />
-    <div class="service-info">
-      <h2>Calculator</h2>
-      <p>{{ calculatormessage }}</p>
+<div class="home-container">
+  <div class="header">
+    <h1>Utility Services</h1>
+    <p class="subtitle">Explore our collection of useful tools and services</p>
+  </div>
+  
+  <div class="search-container">
+    <input 
+      type="text" 
+      placeholder="Search services..." 
+      class="search-input"
+      [formControl]="searchControl"
+    >
+    <button class="search-button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div *ngIf="filteredServices.length > 0; else noResults" class="services-grid">
+    <div *ngFor="let service of filteredServices" 
+         class="service-card" 
+         [routerLink]="service.route" 
+         routerLinkActive="active"
+         [style.--card-color]="service.color">
+      <div class="card-icon">
+        <img [src]="service.image" [alt]="service.title + ' Image'" loading="lazy">
+      </div>
+      <div class="card-content">
+        <h3>{{ service.title }}</h3>
+        <p>{{ service.description }}</p>
+      </div>
+      <div class="card-footer">
+        <span>Try it now</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+        </svg>
+      </div>
     </div>
   </div>
 
-  <div class="service" routerLink="age-calculator" routerLinkActive="active">
-    <img
-      src="./assets/calculator.png"
-      alt="Age Calculator Image"
-      loading="lazy"
-    />
-    <div class="service-info">
-      <h2>Age Calculator</h2>
-      <p>{{ agecalculator }}</p>
+  <ng-template #noResults>
+    <div class="no-results">
+      <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+      </svg>
+      <h3>No services found</h3>
+      <p>Try a different search term</p>
     </div>
-  </div>
-
-  <div class="service" routerLink="currencyconverter" routerLinkActive="active">
-    <img
-      src="./assets/currencyConverter.png"
-      alt="Currency Converter Image"
-      loading="lazy"
-    />
-    <div class="service-info">
-      <h2>Currency Converter</h2>
-      <p>{{ currencymessage }}</p>
-    </div>
-  </div>
-
-  <div class="service" routerLink="findcapital" routerLinkActive="active">
-    <img
-      src="./assets/findCapital.png"
-      alt="Find Capital Image"
-      loading="lazy"
-    />
-    <div class="service-info">
-      <h2>Find Capital</h2>
-      <p>{{ capitalmessage }}</p>
-    </div>
-  </div>
-
-  <div class="service" routerLink="colorpicker" routerLinkActive="active">
-    <img
-      src="./assets/colorPicker.jpg"
-      alt="Color Picker Image"
-      class="colorPicker"
-      loading="lazy"
-    />
-    <div class="service-info">
-      <h2>Color Picker</h2>
-      <p>{{ colorpicker }}</p>
-    </div>
-  </div>
-
-  <div class="service" routerLink="findflag" routerLinkActive="active">
-    <img src="./assets/findFlag.png" alt="Find Flag Image" loading="lazy" />
-    <div class="service-info">
-      <h2>Find Flag</h2>
-      <p>{{ flagmessage }}</p>
-    </div>
-  </div>
-
-  <div class="service" routerLink="worldclock" routerLinkActive="active">
-    <img src="./assets/clock.png" alt="World Clock Image" loading="lazy" />
-    <div class="service-info">
-      <h2>World Clock</h2>
-      <p>{{ clockmessage }}</p>
-    </div>
-  </div>
-
-  <div class="service" routerLink="population" routerLinkActive="active">
-    <img src="./assets/population.jpg" alt="Population Image" loading="lazy" />
-    <div class="service-info">
-      <h2>Find Population</h2>
-      <p>{{ population }}</p>
-    </div>
-  </div>
-
-  <div class="service" routerLink="data-manipulation" routerLinkActive="active">
-    <img
-      src="./assets/datamanipulation.jpg"
-      alt="Population Image"
-      loading="lazy"
-    />
-    <div class="service-info">
-      <h2>Data Manipulator</h2>
-      <p>{{ dataManipulator }}</p>
-    </div>
-  </div>
-
-  <div class="service" routerLink="fontconverter" routerLinkActive="active">
-    <img
-      src="./assets/fontconverter.png"
-      alt="Population Image"
-      loading="lazy"
-    />
-    <div class="service-info">
-      <h2>Font Converter</h2>
-      <p>{{ fontconverter }}</p>
-    </div>
-  </div>
-
-  <div class="service" routerLink="weather-service" routerLinkActive="active">
-    <img
-    src="./assets/weather.jpg"
-    alt="Weather Image"
-    loading="lazy"
-  />
-    <div class="service-info">
-      <h2>Weather Info</h2>
-      <p>{{ weatherinfo }}</p>
-    </div>
-  </div>
+  </ng-template>
 </div>
