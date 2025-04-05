@@ -9,27 +9,25 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   templateUrl: './findcapital.component.html',
   styleUrls: ['./findcapital.component.css']
 })
-export class FindcapitalComponent implements OnInit, AfterViewInit {
+export class FindcapitalComponent implements OnInit {
   selectedCountry: string = '';
   capital: string = '';
   error: string = '';
   countryNames: string[] = [];
   isLargeScreen: boolean = false;
+  isLoading: boolean = true; // Add loading state
 
   protected searchTerm$ = new Subject<string>();
 
   constructor(private findCapitalService: FindCapitalService, private breakpointObserver: BreakpointObserver) { }
 
   ngOnInit(): void {
-    this.countryNames;
-    this.fetchCountryNames();
     this.breakpointObserver.observe([Breakpoints.Large, Breakpoints.XLarge])
       .subscribe(result => {
         this.isLargeScreen = result.matches;
       });
-  }
 
-  ngAfterViewInit(): void {
+    // Initialize the search observable here instead of AfterViewInit
     this.searchTerm$
       .pipe(
         debounceTime(300),
@@ -45,15 +43,21 @@ export class FindcapitalComponent implements OnInit, AfterViewInit {
           this.handleCountryData(data);
         }
       );
+
+    // Fetch country names
+    this.fetchCountryNames();
   }
 
   fetchCountryNames(): void {
+    this.isLoading = true;
     this.findCapitalService.fetchCountryNames().subscribe(
       (data: any[]) => {
         this.countryNames = data.map(country => country.name.common);
+        this.isLoading = false;
       },
       (error) => {
         this.handleFetchError(error);
+        this.isLoading = false;
       }
     );
   }
@@ -82,5 +86,6 @@ export class FindcapitalComponent implements OnInit, AfterViewInit {
   private handleFetchError(error: any): void {
     this.capital = '';
     this.error = 'Error fetching data from the API.';
+    this.isLoading = false;
   }
 }

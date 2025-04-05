@@ -97,6 +97,7 @@ export class HomeComponent implements OnInit {
     }
   ];
   filteredServices: Service[] = [];
+  isSearchFocused: boolean = false;
 
   constructor() { }
 
@@ -108,7 +109,7 @@ export class HomeComponent implements OnInit {
   private setupSearch(): void {
     this.searchControl.valueChanges
       .pipe(
-        debounceTime(300),
+        debounceTime(200),
         distinctUntilChanged()
       )
       .subscribe(searchTerm => {
@@ -127,5 +128,18 @@ export class HomeComponent implements OnInit {
       service.title.toLowerCase().includes(term) || 
       service.description.toLowerCase().includes(term)
     );
+  }
+
+  onSearchFocus(): void {
+    this.isSearchFocused = true;
+  }
+
+  onSearchBlur(): void {
+    this.isSearchFocused = false;
+  }
+
+  clearSearch(): void {
+    this.searchControl.setValue('');
+    this.filteredServices = [...this.allServices];
   }
 }
