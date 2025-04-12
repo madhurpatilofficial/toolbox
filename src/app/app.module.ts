@@ -32,6 +32,7 @@ import { WeatherComponent } from './components/weather/weather.component';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinner, MatSpinner } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatFormFieldModule,
     MatButtonModule,
     MatSelectModule,
+    MatProgressSpinner,
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule,
