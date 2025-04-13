@@ -43,6 +43,7 @@ export class CountriesComponent implements OnInit {
   additionalInfo: any = {};
   isPopulationGraphModalOpen: boolean = false;
   isLoading: boolean = false;
+  isGraphButtonBlinking: boolean = true;
 
   @ViewChild('populationChart') populationChart!: ElementRef;
 
@@ -119,8 +120,7 @@ export class CountriesComponent implements OnInit {
         this.chart.destroy();
       }
 
-      // Adjust canvas size for compact layout
-      ctx.height = window.innerWidth < 1024 ? 250 : 300;
+      ctx.height = window.innerWidth < 768 ? 200 : window.innerWidth < 1024 ? 250 : 300;
 
       const gradient = ctx.getContext('2d')!.createLinearGradient(0, 0, 0, 300);
       gradient.addColorStop(0, '#3498db');

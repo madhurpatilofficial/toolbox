@@ -33,6 +33,11 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinner, MatSpinner } from '@angular/material/progress-spinner';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+
 
 @NgModule({
   declarations: [
@@ -60,6 +65,7 @@ import { MatProgressSpinner, MatSpinner } from '@angular/material/progress-spinn
     BrowserAnimationsModule,
     MatInputModule,
     MatCardModule,
+    MatTabsModule,
     MatFormFieldModule,
     MatButtonModule,
     MatSelectModule,
@@ -70,6 +76,9 @@ import { MatProgressSpinner, MatSpinner } from '@angular/material/progress-spinn
     MatToolbarModule,
     NgxChartsModule,
     MatIconModule,
+    MatMenuModule,
+    MatTooltipModule,
+    MatAutocompleteModule,
     NgxMatSelectSearchModule,
     AlertModule.forRoot(),
   ],

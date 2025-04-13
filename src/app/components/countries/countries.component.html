@@ -48,9 +48,9 @@
           </mat-form-field>
         </div>
 
-        <!-- Population Card -->
+        <!-- Population Card (Reduced Size) -->
         <div
-          class="population-card"
+          class="population-card compact"
           *ngIf="countryPopulation !== undefined"
           @fadeIn
         >
@@ -78,7 +78,10 @@
         </div>
 
         <!-- Chart -->
-        <div class="chart-wrapper">
+        <div
+          class="chart-wrapper"
+          [ngClass]="{ 'chart-active': selectedCountryCode && chartType }"
+        >
           <canvas id="myChart"></canvas>
         </div>
       </section>
@@ -131,6 +134,7 @@
               color="primary"
               (click)="openPopulationGraphModal()"
               class="graph-button"
+              [ngClass]="{ 'blink': isGraphButtonBlinking }"
             >
               <mat-icon class="gradient-icon">insights</mat-icon>
               View Global Graph
@@ -173,7 +177,7 @@
     </div>
   </main>
 
-  <!-- Modal -->
+  <!-- Modal (Enlarged) -->
   <div
     class="modal-overlay"
     [ngClass]="{ open: isPopulationGraphModalOpen }"

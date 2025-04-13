@@ -1,243 +1,325 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-string-manipulator',
   templateUrl: './string-manipulator.component.html',
   styleUrls: ['./string-manipulator.component.css'],
 })
-export class StringManipulatorComponent {
+export class StringManipulatorComponent implements OnInit {
   inputString: string = '';
   resultString: string = '';
   replaceFrom: string = '';
   replaceTo: string = '';
-  insertSubstring: string = '';
-  insertPosition: number = 0;
   insertContent: string = '';
+  insertPosition: number = 0;
   showReplaceInputs: boolean = false;
   showInsertInputs: boolean = false;
   voices: SpeechSynthesisVoice[] = [];
   selectedVoice: SpeechSynthesisVoice | null = null;
+  isSpeaking: boolean = false;
 
-  isBlinking: boolean = true;
-
-  toggleBlink() {
-    this.isBlinking = !this.isBlinking;
-  }
+  searchQuery: string = '';
+  selectedTabIndex: number = 0;
+  allButtons: { [key: string]: { label: string; action: () => void }[] } = {
+    'Basic': [
+      { label: 'To Upper Case', action: () => this.toUpperCase() },
+      { label: 'To Lower Case', action: () => this.toLowerCase() },
+      { label: 'Capitalize Words', action: () => this.capitalizeWords() },
+      { label: 'To Title Case', action: () => this.toTitleCase() },
+      { label: 'Toggle Case', action: () => this.toggleCase() },
+      { label: 'To Camel Case', action: () => this.toCamelCase() },
+      { label: 'To Kebab Case', action: () => this.toKebabCase() },
+      { label: 'To Snake Case', action: () => this.toSnakeCase() },
+      { label: 'To Pascal Case', action: () => this.toPascalCase() },
+    ],
+    'Modify': [
+      { label: 'Reverse String', action: () => this.reverseString() },
+      { label: 'Reverse Words', action: () => this.reverseWords() },
+      { label: 'Reverse Each Word', action: () => this.reverseEachWord() },
+      { label: 'Remove Spaces', action: () => this.removeSpaces() },
+      { label: 'Remove Punctuation', action: () => this.removePunctuation() },
+      { label: 'Remove Duplicates', action: () => this.removeDuplicates() },
+      { label: 'Remove Non-Alphanumeric', action: () => this.removeNonAlphanumeric() },
+      { label: 'Sort Characters', action: () => this.sortCharacters() },
+      { label: 'Scramble String', action: () => this.scrambleString() },
+      { label: 'Truncate String', action: () => this.truncateString(10) },
+      { label: 'Replace Substring', action: () => (this.showReplaceInputs = true) },
+      { label: 'Insert Substring', action: () => (this.showInsertInputs = true) },
+    ],
+    'Encode/Decode': [
+      { label: 'Encode Base64', action: () => this.encodeBase64() },
+      { label: 'Decode Base64', action: () => this.decodeBase64() },
+      { label: 'To Hexadecimal', action: () => this.toHexadecimal() },
+      { label: 'From Hexadecimal', action: () => this.fromHexadecimal() },
+      { label: 'To Binary', action: () => this.toBinary() },
+      { label: 'From Binary', action: () => this.fromBinary() },
+      { label: 'To ASCII', action: () => this.toAscii() },
+      { label: 'From ASCII', action: () => this.fromAscii() },
+      { label: 'To Morse Code', action: () => this.toMorseCode() },
+      { label: 'From Morse Code', action: () => this.fromMorseCode() },
+      { label: 'URL Encode', action: () => this.urlEncode() },
+      { label: 'URL Decode', action: () => this.urlDecode() },
+      { label: 'HTML Encode', action: () => this.htmlEncode() },
+      { label: 'HTML Decode', action: () => this.htmlDecode() },
+      { label: 'ROT13 Encrypt', action: () => this.rot13Encrypt() },
+      { label: 'ROT13 Decrypt', action: () => this.rot13Decrypt() },
+      { label: 'To ROT47', action: () => this.toRot47() },
+      { label: 'From ROT47', action: () => this.fromRot47() },
+    ],
+    'Analyze': [
+      { label: 'Count Words', action: () => this.countWords() },
+      { label: 'Count Characters (Excl. Spaces)', action: () => this.countCharactersExcludingSpaces() },
+      { label: 'Count Digits', action: () => this.countDigits() },
+      { label: 'Count Vowels', action: () => this.countVowels() },
+      { label: 'Count Consonants', action: () => this.countConsonants() },
+      { label: 'Count Uppercase', action: () => this.countUppercase() },
+      { label: 'Count Lowercase', action: () => this.countLowercase() },
+      { label: 'Count Unique Characters', action: () => this.countUniqueCharacters() },
+      { label: 'Count Sentences', action: () => this.countSentences() },
+      { label: 'Check Palindrome', action: () => this.checkPalindrome() },
+      { label: 'Check Isogram', action: () => this.checkIsogram() },
+      { label: 'Check Anagram', action: () => this.checkAnagram() },
+      { label: 'Levenshtein Distance', action: () => this.levenshteinDistance() },
+      { label: 'Jaro-Winkler Similarity', action: () => this.jaroWinklerSimilarity() },
+      { label: 'Sum of Digits', action: () => this.sumOfDigits() },
+      { label: 'Find Longest Word', action: () => this.findLongestWord() },
+      { label: 'Find Shortest Word', action: () => this.findShortestWord() },
+      { label: 'Most Frequent Word', action: () => this.findMostFrequentWord() },
+      { label: 'First Non-Repeated Char', action: () => this.findFirstNonRepeatedChar() },
+      { label: 'Longest Palindrome', action: () => this.findLongestPalindromeSubstring() },
+      { label: 'Count Specific Character', action: () => this.countSpecificCharacter('a') },
+      { label: 'Count Specific Word', action: () => this.countSpecificWord('the') },
+    ],
+    'Misc': [
+      { label: 'Generate Acronym', action: () => this.generateAcronym() },
+      { label: 'To Pig Latin', action: () => this.toPigLatin() },
+      { label: 'Shuffle Words', action: () => this.shuffleWords() },
+      { label: 'Extract Unique Words', action: () => this.extractUniqueWords() },
+      { label: 'Remove HTML Tags', action: () => this.removeHtmlTags() },
+      { label: 'Newlines to <br>', action: () => this.convertNewlinesToBr() },
+      { label: 'Generate Random String', action: () => this.generateRandomString(10) },
+      { label: 'Find All Substrings', action: () => this.findAllSubstrings(3) },
+    ],
+  };
+  filteredButtons: { label: string; action: () => void }[] = [];
 
   ngOnInit() {
     this.populateVoiceList();
-    if (
-      typeof speechSynthesis !== 'undefined' &&
-      speechSynthesis.onvoiceschanged !== undefined
-    ) {
+    if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
       speechSynthesis.onvoiceschanged = this.populateVoiceList.bind(this);
     }
+    this.filterButtonsGlobally();
+    this.setupSpeechEventListeners();
   }
 
   populateVoiceList() {
     if (typeof speechSynthesis === 'undefined') {
       return;
     }
-
     this.voices = speechSynthesis.getVoices();
-    const voiceSelect = document.getElementById('voiceSelect');
-
-    if (voiceSelect) {
-      voiceSelect.innerHTML = ''; // Clear existing options
-
-      for (let i = 0; i < this.voices.length; i++) {
-        const option = document.createElement('option');
-        option.textContent = `${this.voices[i].name} (${this.voices[i].lang})`;
-
-        if (this.voices[i].default) {
-          option.textContent += ' — DEFAULT';
-        }
-
-        option.setAttribute('data-lang', this.voices[i].lang);
-        option.setAttribute('data-name', this.voices[i].name);
-        voiceSelect.appendChild(option);
-      }
-    }
+    this.selectedVoice = this.voices.find(v => v.default) || this.voices[0] || null;
   }
 
   readTextAloud() {
-    if (!this.inputString) return;
-
+    if (!this.inputString || this.isSpeaking) return;
+    this.isSpeaking = true;
     const msg = new SpeechSynthesisUtterance(this.inputString);
-    const selectedVoiceName = (
-      document.getElementById('voiceSelect') as HTMLSelectElement
-    )?.selectedOptions[0]?.getAttribute('data-name');
-
-    if (selectedVoiceName) {
-      const selectedVoice = this.voices.find(
-        (voice) => voice.name === selectedVoiceName
-      );
-      if (selectedVoice) {
-        msg.voice = selectedVoice;
-      }
+    if (this.selectedVoice) {
+      msg.voice = this.selectedVoice;
     }
-
+    msg.onend = () => (this.isSpeaking = false);
     window.speechSynthesis.speak(msg);
   }
 
   stopTextAloud() {
+    this.isSpeaking = false;
     window.speechSynthesis.cancel();
   }
 
-  // Function to remove spaces from input string
+  setupSpeechEventListeners() {
+    if (typeof speechSynthesis !== 'undefined') {
+      speechSynthesis.addEventListener('start', () => (this.isSpeaking = true));
+      speechSynthesis.addEventListener('end', () => (this.isSpeaking = false));
+      speechSynthesis.addEventListener('error', () => (this.isSpeaking = false));
+    }
+  }
+
+  clear() {
+    this.inputString = '';
+    this.resultString = '';
+    this.filterButtonsGlobally();
+  }
+
+  clearAll() {
+    this.inputString = '';
+    this.resultString = '';
+    this.replaceFrom = '';
+    this.replaceTo = '';
+    this.insertContent = '';
+    this.insertPosition = 0;
+    this.showReplaceInputs = false;
+    this.showInsertInputs = false;
+    this.filterButtonsGlobally();
+  }
+
+  resetInputs() {
+    this.showReplaceInputs = false;
+    this.showInsertInputs = false;
+    this.replaceFrom = '';
+    this.replaceTo = '';
+    this.insertContent = '';
+    this.insertPosition = 0;
+  }
+
+  copyToClipboard() {
+    navigator.clipboard.writeText(this.resultString).then(
+      () => alert('Result copied to clipboard!'),
+      () => alert('Failed to copy result.')
+    );
+  }
+
+  saveAsFile() {
+    const blob = new Blob([this.resultString], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `result_${new Date().toISOString().slice(0, 10)}.txt`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  exportResult() {
+    const blob = new Blob([this.resultString], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  }
+
+  clearSearch() {
+    this.searchQuery = '';
+    this.filterButtonsGlobally();
+  }
+
+  filterButtonsGlobally() {
+    const query = this.searchQuery.toLowerCase().trim();
+    this.filteredButtons = [];
+    for (const tab in this.allButtons) {
+      this.filteredButtons = this.filteredButtons.concat(
+        this.allButtons[tab].filter(btn => btn.label.toLowerCase().includes(query))
+      );
+    }
+  }
+
   removeSpaces() {
     this.resultString = this.inputString.replace(/\s/g, '');
   }
-  // Function to convert input string to uppercase
+
   toUpperCase() {
     this.resultString = this.inputString.toUpperCase();
   }
 
-  // Function to convert input string to lowercase
   toLowerCase() {
     this.resultString = this.inputString.toLowerCase();
   }
 
-  // Function to reverse the input string
   reverseString() {
     this.resultString = this.inputString.split('').reverse().join('');
   }
 
-  // Function to reverse the words in the input string
   reverseWords() {
     this.resultString = this.inputString.split(' ').reverse().join(' ');
   }
 
-  // Function to count the number of words in the input string
   countWords() {
     const words = this.inputString.match(/\b\w+\b/g);
     this.resultString = words ? words.length.toString() : '0';
   }
 
-  // Function to clear both input and result strings
-  clear() {
-    this.inputString = '';
-    this.resultString = '';
-    this.resetInputs();
-  }
-
-  // Function to capitalize the first letter of each word in the input string
   capitalizeWords() {
-    this.resultString = this.inputString.replace(/\b\w/g, (char) =>
-      char.toUpperCase()
-    );
+    this.resultString = this.inputString.replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
-  // Function to toggle the case of each character in the input string
   toggleCase() {
     this.resultString = this.inputString.replace(/./g, (char) =>
       char === char.toUpperCase() ? char.toLowerCase() : char.toUpperCase()
     );
   }
 
-  // Function to remove duplicate characters from the input string
   removeDuplicates() {
-    this.resultString = Array.from(new Set(this.inputString.split(''))).join(
-      ''
-    );
+    this.resultString = Array.from(new Set(this.inputString.split(''))).join('');
   }
 
-  // Function to sort characters in the input string alphabetically
   sortCharacters() {
     this.resultString = this.inputString.split('').sort().join('');
   }
 
-  // Function to encode the input string in Base64 format
   encodeBase64() {
     this.resultString = btoa(this.inputString);
   }
 
-  // Function to decode Base64 encoded string back to normal text
   decodeBase64() {
     this.resultString = atob(this.inputString);
   }
 
-  // Function to convert input string to camel case
   toCamelCase() {
-    this.resultString = this.inputString.replace(/\W+(.)/g, (match, chr) =>
-      chr.toUpperCase()
-    );
+    this.resultString = this.inputString.replace(/\W+(.)/g, (match, chr) => chr.toUpperCase());
   }
 
-  // Function to truncate the input string to a specified length
   truncateString(length: number) {
-    if (this.inputString.length > length) {
-      this.resultString = this.inputString.substring(0, length) + '...';
-    } else {
-      this.resultString = this.inputString;
-    }
+    this.resultString =
+      this.inputString.length > length ? this.inputString.substring(0, length) + '...' : this.inputString;
   }
 
-  // Function to convert the input string to title case
   toTitleCase() {
     this.resultString = this.inputString
       .toLowerCase()
       .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
-  // Function to check if input string is a palindrome
   checkPalindrome() {
     if (this.inputString) {
       const original = this.inputString.toLowerCase().replace(/[\W_]/g, '');
       const reversed = original.split('').reverse().join('');
-      this.resultString =
-        original === reversed ? 'Palindrome' : 'Not a Palindrome';
+      this.resultString = original === reversed ? 'Palindrome' : 'Not a Palindrome';
     }
   }
-  // Function to replace occurrences of a substring in the input string
+
   replaceSubstring() {
-    this.resultString = this.inputString.replace(
-      new RegExp(this.replaceFrom, 'g'),
-      this.replaceTo
-    );
-    this.resetInputs(); // Hide inputs after replacing
+    this.resultString = this.inputString.replace(new RegExp(this.replaceFrom, 'g'), this.replaceTo);
+    this.resetInputs();
   }
 
-  // Function to convert input string to kebab case
   toKebabCase() {
     this.resultString = this.inputString.replace(/\W+/g, '-').toLowerCase();
   }
 
-  // Function to convert input string to snake case
   toSnakeCase() {
     this.resultString = this.inputString.replace(/\W+/g, '_').toLowerCase();
   }
 
-  // Function to convert input string to Pascal case
   toPascalCase() {
     this.resultString = this.inputString
       .replace(/\w+/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase())
       .replace(/\W/g, '');
   }
 
-  // Function to count characters excluding spaces
   countCharactersExcludingSpaces() {
     this.resultString = this.inputString.replace(/\s/g, '').length.toString();
   }
 
-  // Function to count vowels
   countVowels() {
     const match = this.inputString.match(/[aeiou]/gi);
     this.resultString = match ? match.length.toString() : '0';
   }
 
-  // Function to count consonants
   countConsonants() {
     const match = this.inputString.match(/[^aeiou\s\d]/gi);
     this.resultString = match ? match.length.toString() : '0';
   }
 
-  // Function to remove punctuation from input string
   removePunctuation() {
     this.resultString = this.inputString.replace(/[^\w\s]|_/g, '');
   }
 
-  // Function to convert input string to hexadecimal
   toHexadecimal() {
     this.resultString = this.inputString
       .split('')
@@ -245,7 +327,6 @@ export class StringManipulatorComponent {
       .join(' ');
   }
 
-  // Function to convert hexadecimal to string
   fromHexadecimal() {
     this.resultString = this.inputString
       .split(' ')
@@ -253,7 +334,6 @@ export class StringManipulatorComponent {
       .join('');
   }
 
-  // Function to scramble input string
   scrambleString() {
     this.resultString = this.inputString
       .split('')
@@ -261,7 +341,6 @@ export class StringManipulatorComponent {
       .join('');
   }
 
-  // Function to generate acronym from input string
   generateAcronym() {
     this.resultString = this.inputString
       .split(' ')
@@ -269,14 +348,10 @@ export class StringManipulatorComponent {
       .join('');
   }
 
-  // Function to calculate Levenshtein distance between two strings
   levenshteinDistance() {
     const a = this.inputString;
-    const b = this.replaceFrom; // Use replaceFrom for second string
-
-    const matrix = Array.from(Array(a.length + 1), () =>
-      Array(b.length + 1).fill(0)
-    );
+    const b = this.replaceFrom;
+    const matrix = Array.from(Array(a.length + 1), () => Array(b.length + 1).fill(0));
 
     for (let i = 0; i <= a.length; i++) {
       for (let j = 0; j <= b.length; j++) {
@@ -297,14 +372,9 @@ export class StringManipulatorComponent {
     this.resultString = matrix[a.length][b.length].toString();
   }
 
-  // Function to calculate Jaro-Winkler similarity between two strings
   jaroWinklerSimilarity() {
     const s1 = this.inputString;
-    const s2 = this.replaceFrom; // Use replaceFrom for second string
-
-    const m = 0.1;
-    const t = 0.1;
-    const l = 0.1;
+    const s2 = this.replaceFrom;
 
     if (!s1.length || !s2.length) {
       this.resultString = '0';
@@ -357,36 +427,29 @@ export class StringManipulatorComponent {
     const jaroSimilarity = (mPrime + nPrime + tPrime) / 3;
     const prefix = s1.substring(0, 4) === s2.substring(0, 4) ? 4 : 0;
 
-    this.resultString = (jaroSimilarity + prefix * t * (1 - jaroSimilarity))
-      .toFixed(2)
-      .toString();
+    this.resultString = (jaroSimilarity + prefix * 0.1 * (1 - jaroSimilarity)).toFixed(2).toString();
   }
 
-  // Function to apply ROT13 encryption
   rot13Encrypt() {
     this.resultString = this.inputString.replace(/[a-zA-Z]/g, (c) =>
       String.fromCharCode(c.charCodeAt(0) + (c.toLowerCase() < 'n' ? 13 : -13))
     );
   }
 
-  // Function to apply ROT13 decryption
   rot13Decrypt() {
     this.resultString = this.inputString.replace(/[a-zA-Z]/g, (c) =>
       String.fromCharCode(c.charCodeAt(0) + (c.toLowerCase() < 'n' ? 13 : -13))
     );
   }
 
-  // Function to URL encode the input string
   urlEncode() {
     this.resultString = encodeURIComponent(this.inputString);
   }
 
-  // Function to URL decode the input string
   urlDecode() {
     this.resultString = decodeURIComponent(this.inputString);
   }
 
-  // Function to HTML encode the input string
   htmlEncode() {
     const htmlEntities: { [key: string]: string } = {
       '&': '&amp;',
@@ -395,75 +458,42 @@ export class StringManipulatorComponent {
       '"': '&quot;',
       "'": '&#39;',
     };
-
-    this.resultString = this.inputString.replace(
-      /[&<>"']/g,
-      (c) => htmlEntities[c] as string
-    );
+    this.resultString = this.inputString.replace(/[&<>"']/g, (c) => htmlEntities[c] as string);
   }
 
-  // Function to HTML decode the input string
   htmlDecode() {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(
-      '<!doctype html><body>' + this.inputString,
-      'text/html'
-    );
+    const doc = parser.parseFromString('<!doctype html><body>' + this.inputString, 'text/html');
     this.resultString = doc.body.textContent || '';
   }
 
-  // Function to count the number of sentences in the input string
   countSentences() {
     const match = this.inputString.match(/[^.!?]+[.!?]+/g);
     this.resultString = match ? match.length.toString() : '0';
   }
 
-  // Function to remove HTML tags from the input string
   removeHtmlTags() {
     const doc = new DOMParser().parseFromString(this.inputString, 'text/html');
     this.resultString = doc.body.textContent || '';
   }
 
-  // Insert substring
   insertSubString() {
-    if (
-      this.insertPosition >= 0 &&
-      this.insertPosition <= this.inputString.length
-    ) {
+    if (this.insertPosition >= 0 && this.insertPosition <= this.inputString.length) {
       this.resultString =
         this.inputString.slice(0, this.insertPosition) +
         this.insertContent +
-        ' ' +
         this.inputString.slice(this.insertPosition);
-      this.resetInsertInputs();
     } else {
       this.resultString = this.inputString;
     }
+    this.resetInputs();
   }
 
-  // Reset insert inputs
-  resetInsertInputs() {
-    this.insertContent = '';
-    this.insertPosition = 0;
-  }
-
-  // Reset all input fields and flags
-  resetInputs() {
-    this.showReplaceInputs = false;
-    this.showInsertInputs = false;
-    this.replaceFrom = '';
-    this.replaceTo = '';
-    this.insertSubstring = '';
-    this.insertPosition = 0;
-  }
-
-  // Function to count digits in the input string
   countDigits() {
     const match = this.inputString.match(/\d/g);
     this.resultString = match ? match.length.toString() : '0';
   }
 
-  // Function to shuffle words in the input string
   shuffleWords() {
     this.resultString = this.inputString
       .split(' ')
@@ -471,33 +501,28 @@ export class StringManipulatorComponent {
       .join(' ');
   }
 
-  // Function to convert input string to ROT47
   toRot47() {
     this.resultString = this.inputString.replace(/[!-~]/g, (c) =>
       String.fromCharCode(33 + ((c.charCodeAt(0) + 14) % 94))
     );
   }
 
-  // Function to convert ROT47 to normal string
   fromRot47() {
     this.resultString = this.inputString.replace(/[!-~]/g, (c) =>
       String.fromCharCode(33 + ((c.charCodeAt(0) + 47) % 94))
     );
   }
 
-  // Function to count uppercase letters
   countUppercase() {
     const match = this.inputString.match(/[A-Z]/g);
     this.resultString = match ? match.length.toString() : '0';
   }
 
-  // Function to count lowercase letters
   countLowercase() {
     const match = this.inputString.match(/[a-z]/g);
     this.resultString = match ? match.length.toString() : '0';
   }
 
-  // Function to convert input string to Morse code
   toMorseCode() {
     const morseCode: { [key: string]: string } = {
       a: '.-',
@@ -544,7 +569,6 @@ export class StringManipulatorComponent {
       .join(' ');
   }
 
-  // Function to convert Morse code to normal string
   fromMorseCode() {
     const morseCode: { [key: string]: string } = {
       '.-': 'a',
@@ -573,6 +597,7 @@ export class StringManipulatorComponent {
       '-..-': 'x',
       '-.--': 'y',
       '--..': 'z',
+      '-----': '0',
       '.----': '1',
       '..---': '2',
       '...--': '3',
@@ -582,7 +607,6 @@ export class StringManipulatorComponent {
       '--...': '7',
       '---..': '8',
       '----.': '9',
-      '-----': '0',
     };
     this.resultString = this.inputString
       .split(' ')
@@ -590,19 +614,16 @@ export class StringManipulatorComponent {
       .join('');
   }
 
-  // Function to count unique characters in the input string
   countUniqueCharacters() {
     this.resultString = new Set(this.inputString).size.toString();
   }
 
-  // Function to count a specific character in the input string
   countSpecificCharacter(char: string) {
     const regex = new RegExp(char, 'g');
     const match = this.inputString.match(regex);
     this.resultString = match ? match.length.toString() : '0';
   }
 
-  // Function to check if the input string is an isogram
   checkIsogram() {
     const str = this.inputString.toLowerCase().replace(/[\W_]/g, '');
     this.resultString = str
@@ -612,7 +633,6 @@ export class StringManipulatorComponent {
       : 'Not an Isogram';
   }
 
-  // Function to check if two strings are anagrams
   checkAnagram() {
     const str1 = this.inputString
       .toLowerCase()
@@ -629,7 +649,6 @@ export class StringManipulatorComponent {
     this.resultString = str1 === str2 ? 'Anagram' : 'Not an Anagram';
   }
 
-  // Function to convert input string to ASCII values
   toAscii() {
     this.resultString = this.inputString
       .split('')
@@ -637,7 +656,6 @@ export class StringManipulatorComponent {
       .join(' ');
   }
 
-  // Function to convert ASCII values to string
   fromAscii() {
     this.resultString = this.inputString
       .split(' ')
@@ -645,7 +663,6 @@ export class StringManipulatorComponent {
       .join('');
   }
 
-  // Function to reverse each word in the input string
   reverseEachWord() {
     this.resultString = this.inputString
       .split(' ')
@@ -653,36 +670,24 @@ export class StringManipulatorComponent {
       .join(' ');
   }
 
-  // Function to remove non-alphanumeric characters from the input string
   removeNonAlphanumeric() {
     this.resultString = this.inputString.replace(/[^a-z0-9]/gi, '');
   }
 
-  // Function to find the longest word in the input string
   findLongestWord() {
     const words = this.inputString.match(/\b\w+\b/g);
     this.resultString = words
-      ? words.reduce(
-          (longest, current) =>
-            current.length > longest.length ? current : longest,
-          ''
-        )
+      ? words.reduce((longest, current) => (current.length > longest.length ? current : longest), '')
       : '';
   }
 
-  // Function to find the shortest word in the input string
   findShortestWord() {
     const words = this.inputString.match(/\b\w+\b/g);
     this.resultString = words
-      ? words.reduce(
-          (shortest, current) =>
-            current.length < shortest.length ? current : shortest,
-          ''
-        )
+      ? words.reduce((shortest, current) => (current.length < shortest.length ? current : shortest), '')
       : '';
   }
 
-  // Function to calculate the sum of digits in the input string
   sumOfDigits() {
     const match = this.inputString.match(/\d/g);
     this.resultString = match
@@ -690,18 +695,15 @@ export class StringManipulatorComponent {
       : '0';
   }
 
-  // Function to convert newlines to <br> in the input string
   convertNewlinesToBr() {
     this.resultString = this.inputString.replace(/\n/g, '<br>');
   }
 
-  // Function to extract unique words in the input string
   extractUniqueWords() {
     const words = this.inputString.match(/\b\w+\b/g);
     this.resultString = words ? Array.from(new Set(words)).join(', ') : '';
   }
 
-  // Function to find the most frequent word in the input string
   findMostFrequentWord() {
     const words = this.inputString.match(/\b\w+\b/g);
     if (words) {
@@ -718,17 +720,13 @@ export class StringManipulatorComponent {
     }
   }
 
-  // Function to convert input string to Pig Latin
   toPigLatin() {
     this.resultString = this.inputString
       .split(' ')
-      .map((word) =>
-        word.length > 1 ? word.slice(1) + word[0] + 'ay' : word + 'ay'
-      )
+      .map((word) => (word.length > 1 ? word.slice(1) + word[0] + 'ay' : word + 'ay'))
       .join(' ');
   }
 
-  // Function to find the first non-repeated character in the input string
   findFirstNonRepeatedChar() {
     const frequencyMap = this.inputString.split('').reduce((acc, char) => {
       acc[char] = (acc[char] || 0) + 1;
@@ -738,16 +736,13 @@ export class StringManipulatorComponent {
       this.inputString.split('').find((char) => frequencyMap[char] === 1) || '';
   }
 
-  // Function to generate a random string of specified length
   generateRandomString(length: number) {
-    const characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     this.resultString = Array.from({ length }, () =>
       characters.charAt(Math.floor(Math.random() * characters.length))
     ).join('');
   }
 
-  // Function to convert input string to binary
   toBinary() {
     this.resultString = this.inputString
       .split('')
@@ -755,7 +750,6 @@ export class StringManipulatorComponent {
       .join(' ');
   }
 
-  // Function to convert binary to string
   fromBinary() {
     this.resultString = this.inputString
       .split(' ')
@@ -763,17 +757,13 @@ export class StringManipulatorComponent {
       .join('');
   }
 
-  // Function to find the longest palindrome substring in the input string
   findLongestPalindromeSubstring() {
     const isPalindrome = (s: string) => s === s.split('').reverse().join('');
     let longestPalindrome = '';
     for (let i = 0; i < this.inputString.length; i++) {
       for (let j = i + 1; j <= this.inputString.length; j++) {
         const substring = this.inputString.slice(i, j);
-        if (
-          isPalindrome(substring) &&
-          substring.length > longestPalindrome.length
-        ) {
+        if (isPalindrome(substring) && substring.length > longestPalindrome.length) {
           longestPalindrome = substring;
         }
       }
@@ -781,7 +771,6 @@ export class StringManipulatorComponent {
     this.resultString = longestPalindrome;
   }
 
-  // Function to find all substrings of a given length
   findAllSubstrings(length: number) {
     const substrings = [];
     for (let i = 0; i <= this.inputString.length - length; i++) {
@@ -790,7 +779,6 @@ export class StringManipulatorComponent {
     this.resultString = substrings.join(', ');
   }
 
-  // Function to count occurrences of a specific word
   countSpecificWord(word: string) {
     const regex = new RegExp(`\\b${word}\\b`, 'gi');
     const match = this.inputString.match(regex);
