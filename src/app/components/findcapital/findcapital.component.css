@@ -1,149 +1,153 @@
-.select-wrapper {
-  position: relative;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.select-wrapper select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
-  color: #333;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #314d85 50%),
-    linear-gradient(135deg, #2c4f96 50%, transparent 50%);
-  background-position: calc(100% - 20px) calc(1em + 2px),
-    calc(100% - 15px) calc(1em + 2px);
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
-  cursor: pointer;
-}
-
-.select-wrapper::after {
-  content: "\25BC"; /* Unicode character for down arrow */
-  font-size: 16px;
-  color: #555;
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-/* Style for when the dropdown is open */
-.select-wrapper select:active,
-.select-wrapper select:focus {
-  outline: none;
-  border-color: #297acc; /* Change border color on focus */
-  background-image: linear-gradient(45deg, transparent 50%, #182848 50%),
-    linear-gradient(135deg, #182848 50%, transparent 50%);
-  background-position: calc(100% - 15px) 1em, calc(100% - 20px) 1em;
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
-}
-
-.find-capital-container {
-  max-width: 400px;
-  margin: 40px auto;
-  padding: 20px;
-  background: #addcfd;
-  color: #000000;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgb(0 14 252 / 30%);
-  font-weight: bold;
-}
-
-label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.error-message,
-.result {
-  margin-top: 15px;
-  padding: 10px;
-  border-radius: 4px;
-}
-
-.error-message {
-  background-color: #ff5c5c; /* Red background for error messages */
-}
-
-.result {
-  background-color: #4caf50; /* Green background for result messages */
-}
-
-.custom-width {
-  width: 400px; /* Adjust the width as needed */
-}
-
-.custom-width .mat-form-field-flex {
-  width: 100%;
-}
-
-@media (max-width: 600px) {
-  .custom-width {
-    margin-left: -1rem;
-  }
-}
-@media (max-width: 434px) {
-  .custom-width {
-    width: 350px !important;
-    margin-left: 4px;
-  }
-}
-
-@media (max-width: 590px) {
-  .custom-width {
-    width: 350px !important;
-    margin-left: 4px;
-  }
-}
-
-
-/* General styles for the container */
-.calculator-container {
+.container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem;
 }
 
-/* Styles specific to the title */
-.calculator-title {
-  margin-top: 2rem;
-  width: 150% !important;
-  width: 700px;
+.header {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.header.large-screen {
+  max-width: 800px;
+}
+
+.title-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+mat-card-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1a237e;
+}
+
+mat-card-subtitle {
+  font-size: 1rem;
+  color: #546e7a;
+}
+
+.content {
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.search-card:hover {
+  transform: translateY(-4px);
+}
+
+.search-field {
+  width: 100%;
+  font-size: 1.1rem;
+}
+
+.search-field mat-label {
+  color: #37474f;
+}
+
+.loading-container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin: 2rem 0;
 }
 
-.calculator-title .mat-card {
-  width: 440px;
-  height: 100px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgb(0 14 252 / 30%);
-}
-
-.mat-card-content {
-  font-size: 1.5rem;
-  font-weight: 500;
+.result-container {
+  margin-top: 2rem;
   text-align: center;
-  margin-top: 40px;
+}
+
+.result-card {
+  background: #e8eaf6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.result-card h3 {
+  margin: 0 0 0.5rem;
+  color: #1a237e;
+  font-size: 1.25rem;
+}
+
+.capital {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #283593;
+  margin: 0;
+}
+
+.error-card {
+  background: #ffebee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: #c62828;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.error-card mat-icon {
+  font-size: 1.5rem;
+}
+
+.inline-spinner {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+/* Custom select panel styling */
+::ng-deep .custom-select-panel {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  max-height: 300px !important;
+}
+
+::ng-deep .mat-option {
+  font-size: 1rem;
+  padding: 0.75rem 1rem !important;
+  transition: background-color 0.2s ease;
+}
+
+::ng-deep .mat-option:hover {
+  background-color: #e8eaf6 !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .search-card {
+    padding: 1.5rem;
+  }
+
+  mat-card-title {
+    font-size: 1.5rem;
+  }
 }

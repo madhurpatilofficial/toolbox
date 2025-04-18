@@ -37,6 +37,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { MatDividerModule } from '@angular/material/divider';
 
 
 @NgModule({
@@ -79,6 +80,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
     MatMenuModule,
     MatTooltipModule,
     MatAutocompleteModule,
+    MatDividerModule,
     NgxMatSelectSearchModule,
     AlertModule.forRoot(),
   ],

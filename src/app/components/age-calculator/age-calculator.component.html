@@ -1,68 +1,123 @@
 <div class="calculator-container">
-  <div *ngIf="isLargeScreen" class="calculator-title mat-card mat-elevation-z4">
-    <div class="mat-card-content">Age Calculator</div>
+  <!-- Celebration Overlay -->
+  <div *ngIf="showCelebration" class="celebration-overlay">
+    <div class="celebration-content">
+      <mat-icon class="celebration-icon">celebration</mat-icon>
+      <p>Wishing you a wonderful year ahead!</p>
+    </div>
   </div>
 
-  <div class="container">
-    <mat-card class="card">
+  <div class="header">
+    <h1 class="title">Age Calculator</h1>
+    <p class="subtitle">Discover your exact age down to the second</p>
+  </div>
+
+  <div class="content-container">
+    <mat-card class="input-card mat-elevation-z8">
       <mat-card-content>
-        <mat-label class="text">Enter Your Birthdate</mat-label>
-        <div class="input-wrapper">
-          <mat-form-field appearance="fill">
-            <mat-label>Birth Date</mat-label>
-            <input
-              matInput
-              [matDatepicker]="picker"
-              [(ngModel)]="birthDate"
-              (dateChange)="calculateAge()"
-              [max]="maxDate"
-              [min]="minDate"
-            />
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
+        <div class="input-section">
+          <div class="current-time">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ currentTime | date:'medium' }}</span>
+          </div>
+          
+          <div class="date-picker-container">
+            <div class="date-picker-wrapper">
+              <mat-form-field appearance="fill" floatLabel="always" class="elegant-date-picker">
+                <mat-label>Your Birth Date</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  [(ngModel)]="birthDate"
+                  (dateChange)="calculateAge()"
+                  [max]="maxDate"
+                  [min]="minDate"
+                  placeholder="Select your birth date"
+                />
+                <mat-datepicker-toggle matSuffix [for]="picker">
+                  <mat-icon matDatepickerToggleIcon class="date-picker-icon">calendar_today</mat-icon>
+                </mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+              <div class="date-picker-decoration"></div>
+            </div>
+            <mat-hint class="date-hint">Select a date between 1900 and today</mat-hint>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="result-card">
-      <mat-card-header>
-        <mat-card-title class="result-title">Age Result</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div *ngIf="birthDate" class="result">
-          <mat-card class="result-item">
-            <mat-card-content>
-              <p><strong>Years:</strong> {{ age.years }}</p>
-            </mat-card-content>
-          </mat-card>
-          <mat-card class="result-item">
-            <mat-card-content>
-              <p><strong>Months:</strong> {{ age.months }}</p>
-            </mat-card-content>
-          </mat-card>
-          <mat-card class="result-item">
-            <mat-card-content>
-              <p><strong>Days:</strong> {{ age.days }}</p>
-            </mat-card-content>
-          </mat-card>
-          <mat-card class="result-item">
-            <mat-card-content>
-              <p><strong>Hours:</strong> {{ age.hours }}</p>
-            </mat-card-content>
-          </mat-card>
-          <mat-card class="result-item">
-            <mat-card-content>
-              <p><strong>Minutes:</strong> {{ age.minutes }}</p>
-            </mat-card-content>
-          </mat-card>
-          <mat-card class="result-item">
-            <mat-card-content>
-              <p><strong>Seconds:</strong> {{ age.seconds }}</p>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </mat-card-content>
-    </mat-card>
+    <div *ngIf="showResults" class="results-container" @fadeIn>
+      <mat-card class="summary-card mat-elevation-z8">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon class="card-icon" (click)="toggleCelebration()" [class.bounce]="showCelebration">cake</mat-icon>
+            Your Age Summary
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="primary-age">
+              <span class="age-number">{{ age.years }}</span>
+              <span class="age-label">Years</span>
+            </div>
+            <div class="secondary-ages">
+              <div class="age-item">
+                <span class="age-number">{{ age.months }}</span>
+                <span class="age-label">Months</span>
+              </div>
+              <div class="age-item">
+                <span class="age-number">{{ age.days }}</span>
+                <span class="age-label">Days</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="detailed-results">
+        <mat-card class="time-card mat-elevation-z4">
+          <mat-card-content>
+            <div class="time-item">
+              <mat-icon>hourglass_top</mat-icon>
+              <div>
+                <div class="time-value">{{ age.hours | number }}</div>
+                <div class="time-label">Hours</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="time-card mat-elevation-z4">
+          <mat-card-content>
+            <div class="time-item">
+              <mat-icon>timer</mat-icon>
+              <div>
+                <div class="time-value">{{ age.minutes | number }}</div>
+                <div class="time-label">Minutes</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="time-card mat-elevation-z4">
+          <mat-card-content>
+            <div class="time-item">
+              <mat-icon>update</mat-icon>
+              <div>
+                <div class="time-value">{{ age.seconds | number }}</div>
+                <div class="time-label">Seconds</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <div *ngIf="!birthDate" class="empty-state">
+      <mat-icon class="empty-icon">event</mat-icon>
+      <h3>Select your birth date to begin</h3>
+      <p>We'll calculate your exact age in years, months, days, and even seconds!</p>
+    </div>
   </div>
 </div>

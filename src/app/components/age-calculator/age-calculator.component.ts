@@ -1,5 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnDestroy } from '@angular/core';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-age-calculator',
@@ -12,61 +13,78 @@ export class AgeCalculatorComponent implements OnDestroy {
   maxDate: Date;
   minDate: Date;
   isLargeScreen: boolean = false;
-
+  primaryColor: ThemePalette = 'primary';
+  accentColor: ThemePalette = 'accent';
+  showResults: boolean = false;
+  currentTime: Date = new Date();
+  showCelebration: boolean = false;
 
   ngOnInit(): void {
     this.breakpointObserver.observe([Breakpoints.Large, Breakpoints.XLarge])
-    .subscribe(result => {
-      this.isLargeScreen = result.matches;
-    });
+      .subscribe(result => {
+        this.isLargeScreen = result.matches;
+      });
+    
+    // Update current time every second
+    setInterval(() => {
+      this.currentTime = new Date();
+      if (this.birthDate) {
+        this.calculateAge();
+      }
+    }, 1000);
   }
-
 
   constructor(private breakpointObserver: BreakpointObserver) {
     this.maxDate = new Date();
-    this.minDate = new Date(1910, 0, 1);
+    this.minDate = new Date(1900, 0, 1);
   }
-
-  private timer: any;
 
   calculateAge() {
     if (this.birthDate) {
       const today = new Date();
       const birthDate = new Date(this.birthDate);
+      
+      // Calculate years
       let age = today.getFullYear() - birthDate.getFullYear();
       const month = today.getMonth() - birthDate.getMonth();
-
+      
       if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-      const monthInMilliseconds = 30 * 24 * 60 * 60 * 1000;
-      const dayInMilliseconds = 24 * 60 * 60 * 1000;
-
-      const diffMilliseconds = Math.abs(today.getTime() - birthDate.getTime());
       
-      this.age.years = age;
-      this.age.months = Math.floor(diffMilliseconds / monthInMilliseconds);
-      this.age.days = Math.floor(diffMilliseconds / dayInMilliseconds);
-      this.age.hours = Math.floor(diffMilliseconds / (60 * 60 * 1000));
-      this.age.minutes = Math.floor(diffMilliseconds / (60 * 1000));
-      this.age.seconds = Math.floor(diffMilliseconds / 1000);
+      // Calculate months
+      let months = (today.getFullYear() - birthDate.getFullYear()) * 12;
+      months -= birthDate.getMonth();
+      months += today.getMonth();
+      
+      // Calculate days
+      const diffTime = Math.abs(today.getTime() - birthDate.getTime());
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      this.age = {
+        years: age,
+        months: months,
+        days: diffDays,
+        hours: Math.floor(diffTime / (1000 * 60 * 60)),
+        minutes: Math.floor(diffTime / (1000 * 60)),
+        seconds: Math.floor(diffTime / 1000)
+      };
+      
+      this.showResults = true;
+    }
+  }
 
-      // Update every second
-      this.timer = setTimeout(() => {
-        this.calculateAge();
-      }, 1000);
+  toggleCelebration() {
+    this.showCelebration = !this.showCelebration;
+    
+    if (this.showCelebration) {
+      setTimeout(() => {
+        this.showCelebration = false;
+      }, 3000);
     }
   }
 
   ngOnDestroy() {
-    // Clear the timer when component is destroyed
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
+    // Clear any intervals if needed
   }
-  getMinDate(): string {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  }
-  
 }

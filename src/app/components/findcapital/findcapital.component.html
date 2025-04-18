@@ -1,21 +1,54 @@
-<div class="calculator-container">
-  <div *ngIf="isLargeScreen" class="calculator-title">
-    <div class="mat-card mat-elevation-z4">
-      <div class="mat-card-content">Find Capital</div>
-    </div>
+<div class="container">
+  <!-- Header Section -->
+  <div class="header" [ngClass]="{'large-screen': isLargeScreen}">
+    <mat-card class="title-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Discover Capitals</mat-card-title>
+        <mat-card-subtitle>Find the capital city of any country</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
   </div>
 
-  <div class="find-capital-container" style="margin-top: 5rem;">
-    <mat-form-field appearance="fill" class="custom-width">
-      <mat-label>Select a Country</mat-label>
-      <mat-select [(value)]="selectedCountry" (selectionChange)="searchTerm$.next($event.value)">
-        <mat-option value="" disabled>Select a country</mat-option>
-        <mat-option *ngIf="isLoading" value="" disabled>Loading countries...</mat-option>
-        <mat-option *ngFor="let country of countryNames" [value]="country">{{ country }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+  <!-- Main Content -->
+  <div class="content">
+    <mat-card class="search-card" appearance="outlined">
+      <mat-card-content>
+        <!-- Search Input -->
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Choose a Country</mat-label>
+          <mat-select 
+            [(value)]="selectedCountry" 
+            (selectionChange)="onCountrySelected()"
+            [disabled]="isLoading"
+            panelClass="custom-select-panel"
+          >
+            <mat-option value="" disabled>Select a country</mat-option>
+            <mat-option *ngIf="isLoading" value="" disabled>
+              <mat-spinner diameter="20" class="inline-spinner"></mat-spinner> Loading countries...
+            </mat-option>
+            <mat-option *ngFor="let country of countryNames" [value]="country">
+              {{ country }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-    <div *ngIf="error" class="error-message">{{ error }}</div>
-    <div *ngIf="capital" class="result">Capital: {{ capital }}</div>
+        <!-- Loading Indicator -->
+        <div class="loading-container" *ngIf="isLoading && selectedCountry">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <!-- Result Display -->
+        <div class="result-container" *ngIf="!isLoading && (capital || error)">
+          <div class="result-card" *ngIf="capital && !error" @fadeIn>
+            <h3>Capital City</h3>
+            <p class="capital">{{ capital }}</p>
+          </div>
+          <div class="error-card" *ngIf="error" @fadeIn>
+            <mat-icon>error_outline</mat-icon>
+            <p>{{ error }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 </div>

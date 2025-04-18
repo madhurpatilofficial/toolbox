@@ -1,115 +1,336 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  margin-top: 50px;
-  width: 100%;
-}
-
-.calculator-title {
-  margin-top: 2rem;
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgb(0 14 252 / 30%);
-  height: 100px;
-}
-
-.mat-card-content {
-  font-size: 1.5rem;
-  font-weight: 500;
-  text-align: center;
-}
-
+/* General Styles */
 .calculator-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-.card {
-  width: 80%;
-  max-width: 400px;
-  background-color: #addcfd;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.input-wrapper {
-  position: relative;
-  margin-left: 64px;
-  margin-top: 5px;
-}
-
-.text {
-  margin-left: 8rem;
-}
-
-.input-wrapper input[type="date"] {
-  border: 2px solid #ccc;
-  border-radius: 5px;
-  padding: 8px;
-  width: 200px;
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #3f51b5;
 }
 
 .title {
-  margin-bottom: 9px;
-  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-top: 0;
+}
+
+.content-container {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Input Card */
+.input-card {
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  background-color: white;
+}
+
+.input-section {
+  padding: 1.5rem;
+}
+
+.current-time {
+  display: flex;
   align-items: center;
-  color: #1976d2;
-  margin-left: 8rem;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+  color: #3f51b5;
+  font-weight: 500;
 }
 
-.result-card {
-  width: 80%;
-  max-width: 400px;
-  background-color: #dfffe1; /* Light green */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
+.current-time mat-icon {
+  color: #3f51b5;
 }
 
-.result-item {
-  background-color: #ffffff; /* White */
-  margin-bottom: 10px;
-}
-
-.result-item p {
-  margin: 10px;
-}
-
-.mat-form-field {
+.date-picker-container {
   width: 100%;
 }
 
-.result {
-  margin-top: 20px;
+/* Results */
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-.result p {
-  margin: 5px 0;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+.summary-card {
+  border-radius: 12px;
+  background-color: #3f51b5;
+  color: white;
+}
+
+.summary-card mat-card-title {
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.summary-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+}
+
+.primary-age {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.age-number {
+  font-size: 3.5rem;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.secondary-ages {
+  display: flex;
+  gap: 2rem;
+}
+
+.age-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.age-label {
+  font-size: 1rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Detailed Results */
+.detailed-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.time-card {
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.time-card:hover {
+  transform: translateY(-5px);
+}
+
+.time-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.time-item mat-icon {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+  color: #3f51b5;
+}
+
+.time-value {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.time-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  color: #3f51b5;
+  opacity: 0.7;
+}
+
+.empty-state h3 {
+  margin-bottom: 0.5rem;
+  color: #3f51b5;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 600px) {
-  .input-wrapper {
-    justify-content: flex-start;
-    margin-left: 25px;
+  .calculator-container {
+    padding: 1rem;
   }
-  .text {
-    margin-left: 5rem;
-  }
+  
   .title {
-    margin-left: 5rem;
+    font-size: 2rem;
   }
-  .result-title {
-    margin-left: 6rem;
+  
+  .summary-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .secondary-ages {
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .detailed-results {
+    grid-template-columns: 1fr;
   }
 }
+
+/* Celebration Overlay */
+.celebration-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.celebration-content {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.celebration-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: #ff4081;
+  margin-bottom: 1rem;
+  animation: bounce 1s infinite alternate;
+}
+
+.celebration-overlay h2 {
+  font-size: 2.5rem;
+  color: #d81b60;
+  margin-bottom: 0.5rem;
+}
+
+.celebration-overlay p {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Date Picker Improvements */
+.date-picker-wrapper {
+  position: relative;
+}
+
+.elegant-date-picker {
+  width: 100%;
+}
+
+.elegant-date-picker .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+
+.elegant-date-picker .mat-form-field-outline {
+  background-color: white;
+  border-radius: 8px;
+}
+
+.date-picker-icon {
+  color: #3f51b5;
+  transform: scale(1.2);
+}
+
+.date-picker-decoration {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3f51b5, #ff4081);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.elegant-date-picker.mat-focused .date-picker-decoration {
+  transform: scaleX(1);
+}
+
+.date-hint {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Cake Icon Animation */
+.card-icon {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.card-icon:hover {
+  transform: scale(1.1);
+}
+
+.bounce {
+  animation: bounce 0.5s;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Rest of the CSS remains the same as previous version */
