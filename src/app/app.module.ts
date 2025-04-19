@@ -39,6 +39,7 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatDividerModule } from '@angular/material/divider';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
 
 @NgModule({
@@ -74,6 +75,7 @@ import { MatDividerModule } from '@angular/material/divider';
     MatProgressSpinner,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatButtonToggleModule,
     ReactiveFormsModule,
     MatToolbarModule,
     NgxChartsModule,

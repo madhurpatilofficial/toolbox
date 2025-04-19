@@ -1,38 +1,169 @@
-<div class="title" *ngIf="isLargeScreen">
-  <h2>Font Converter</h2>
-</div>
-<div class="newcont">
-  <div class="container">
-    <div>
-      <mat-form-field appearance="fill" class="custom-width">
-        <mat-label>Type your text here</mat-label>
-        <textarea
-          cdkTextareaAutosize
-          cdkAutosizeMinRows="3"
-          cdkAutosizeMaxRows="10"
-          #autosize="cdkTextareaAutosize"
-          matInput
-          [(ngModel)]="inputText"
-          (input)="convertText()"
-        ></textarea>
-      </mat-form-field>
-      <mat-form-field appearance="fill" class="custom-width">
-        <mat-label>Select a font</mat-label>
-        <mat-select [(ngModel)]="selectedFont">
-          <mat-option *ngFor="let font of fonts" [value]="font">{{
-            font
-          }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+<div class="font-converter-wrapper" [ngClass]="{'dark-mode': isDarkMode}">
+  <header class="converter-header" [@fadeIn]>
+    <div class="header-content">
+      <h1>Font Explorer</h1>
+      <p class="subtitle">Preview and compare fonts for your next project</p>
     </div>
+    <button mat-icon-button class="theme-toggle" (click)="toggleDarkMode()" aria-label="Toggle dark mode">
+      <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+  </header>
+
+  <div class="converter-layout" [ngClass]="{'large-screen': isLargeScreen}">
+    <!-- Input Panel -->
+    <section class="input-panel" [@slideIn]>
+      <div class="input-controls">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Your Text</mat-label>
+          <textarea 
+            #previewArea
+            matInput 
+            [(ngModel)]="inputText" 
+            (input)="convertText()"
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="3"
+            cdkAutosizeMaxRows="10"
+            placeholder="Type or paste text here to preview in different fonts..."
+          ></textarea>
+          <button *ngIf="inputText" mat-icon-button matSuffix (click)="inputText=''; convertText()">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <div class="font-controls">
+          <mat-form-field appearance="outline">
+            <mat-label>Category</mat-label>
+            <mat-select [(value)]="currentCategory" (selectionChange)="filterByCategory(currentCategory)">
+              <mat-option value="all">All Fonts</mat-option>
+              <mat-option value="recent">Recent</mat-option>
+              <mat-option value="sans">Sans-Serif</mat-option>
+              <mat-option value="serif">Serif</mat-option>
+              <mat-option value="mono">Monospace</mat-option>
+              <mat-option value="display">Display</mat-option>
+              <mat-option value="special">Special</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Font</mat-label>
+            <mat-select [(ngModel)]="selectedFont" (selectionChange)="convertText()">
+              <mat-option *ngFor="let font of filteredFonts" [value]="font" [style.fontFamily]="font">
+                {{ font }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="style-controls">
+          <mat-form-field appearance="outline" class="small-field">
+            <mat-label>Size</mat-label>
+            <mat-select [(value)]="fontSize" (selectionChange)="setFontSize(fontSize)">
+              <mat-option [value]="12">12px</mat-option>
+              <mat-option [value]="14">14px</mat-option>
+              <mat-option [value]="16">16px</mat-option>
+              <mat-option [value]="18">18px</mat-option>
+              <mat-option [value]="20">20px</mat-option>
+              <mat-option [value]="24">24px</mat-option>
+              <mat-option [value]="32">32px</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="small-field">
+            <mat-label>Weight</mat-label>
+            <mat-select [(value)]="fontWeight" (selectionChange)="setFontWeight(fontWeight)">
+              <mat-option value="normal">Regular</mat-option>
+              <mat-option value="bold">Bold</mat-option>
+              <mat-option value="lighter">Light</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="small-field">
+            <mat-label>Style</mat-label>
+            <mat-select [(value)]="fontStyle" (selectionChange)="setFontStyle(fontStyle)">
+              <mat-option value="normal">Normal</mat-option>
+              <mat-option value="italic">Italic</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="color-field">
+            <mat-label>Text Color</mat-label>
+            <input matInput [(ngModel)]="textColor" type="color" (change)="setTextColor(textColor)">
+          </mat-form-field>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview Panel -->
+    <section class="preview-panel" [@slideIn]>
+      <div class="preview-header">
+        <h2>Preview</h2>
+        <div class="font-info">
+          <span class="font-name">{{ selectedFont }}</span>
+          <span class="font-category" *ngIf="fontCategories.sans.includes(selectedFont)">Sans-Serif</span>
+          <span class="font-category" *ngIf="fontCategories.serif.includes(selectedFont)">Serif</span>
+          <span class="font-category" *ngIf="fontCategories.mono.includes(selectedFont)">Monospace</span>
+          <span class="font-category" *ngIf="fontCategories.display.includes(selectedFont)">Display</span>
+          <span class="font-category" *ngIf="fontCategories.special.includes(selectedFont)">Special</span>
+        </div>
+      </div>
+
+   <!-- Update your preview text div in the HTML template to include the #previewText reference -->
+<div class="preview-content">
+  <div class="preview-text" #previewText [ngClass]="{'placeholder': showPlaceholder}" 
+       [style.font-family]="selectedFont"
+       [style.font-size.px]="fontSize"
+       [style.font-weight]="fontWeight"
+       [style.font-style]="fontStyle"
+       [style.color]="textColor">
+    <ng-container *ngIf="!showPlaceholder">{{ convertedText }}</ng-container>
+    <ng-container *ngIf="showPlaceholder">
+      <p>The quick brown fox jumps over the lazy dog.</p>
+      <p>ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+      <p>abcdefghijklmnopqrstuvwxyz</p>
+      <p>0123456789 !#$%^&*()</p>
+    </ng-container>
   </div>
-  <div class="container" *ngIf="selectedFont">
-    <div class="converted-text" [style.font-family]="selectedFont">
-      <mat-label class="output-text">{{ convertedText }}</mat-label>
-      <div class="converted-text-buttons">
-        <button mat-raised-button color="primary" (click)="copyConvertedText()">Copy</button>
+
+  <div class="preview-actions">
+    <button mat-raised-button color="primary" [disabled]="!convertedText" 
+            [ngClass]="{'copied': isCopied}"
+            (click)="copyConvertedText()">
+      <mat-icon>{{ isCopied ? 'check' : 'content_copy' }}</mat-icon>
+      {{ isCopied ? 'Copied!' : 'Copy Text' }}
+    </button>
+  </div>
+</div>
+    </section>
+  </div>
+
+  <!-- Font Combinations Inspiration -->
+  <section class="font-inspiration" *ngIf="isLargeScreen" [@fadeIn]>
+    <h3>Font Combinations</h3>
+    <div class="combination-cards">
+      <mat-card *ngFor="let combo of fontCombinations" class="font-combo-card" (click)="applyFontCombination(combo.heading, combo.body)">
+        <mat-card-header>
+          <mat-card-title [style.font-family]="combo.heading">{{ combo.name }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="heading-example" [style.font-family]="combo.heading">Heading Font: {{ combo.heading }}</p>
+          <p class="body-example" [style.font-family]="combo.body">Body Font: {{ combo.body }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Font Categories Quick Access -->
+  <section class="category-shortcuts" *ngIf="!isLargeScreen" [@fadeIn]>
+    <div class="category-chip-container">
+      <!-- Replace mat-chip-list with a simple button/tab alternative -->
+      <div class="category-buttons">
+        <button mat-button 
+          *ngFor="let category of ['all', 'sans', 'serif', 'mono', 'display']"
+          [class.active]="currentCategory === category"
+          (click)="filterByCategory(category)">
+          {{ category === 'all' ? 'All Fonts' : category }}
+        </button>
       </div>
     </div>
-  </div>
-  
+  </section>
 </div>
