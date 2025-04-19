@@ -1,48 +1,86 @@
-<div class="container">
-  <!-- Header -->
-  <header class="header">
-    <h1 class="header-title">Find Your Country's Flag</h1>
-    <p class="header-subtitle">Select a country to view and download its flag</p>
-  </header>
+<div class="app-container">
 
   <!-- Main Content -->
-  <div class="card">
-    <!-- Country Selector -->
-    <mat-form-field appearance="outline" class="country-selector" floatLabel="always">
-      <mat-label>Choose a Country</mat-label>
-      <mat-select
-        [(value)]="selectedCountry"
-        (selectionChange)="onCountrySelected()"
-        aria-label="Select a country"
-        placeholder="Select a country"
-      >
-        <mat-option value="" disabled>Select a country</mat-option>
-        <mat-option *ngFor="let country of countries" [value]="country.value">
-          {{ country.display }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+  <main class="app-content">
+    <div class="search-section">
+      <mat-card class="search-card">
+        <mat-card-header>
+          <mat-card-title class="search-title">
+            <mat-icon class="section-icon">search</mat-icon>
+            Find Country Flags
+          </mat-card-title>
+          <mat-card-subtitle>Select a country to view and download its flag</mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <!-- Country Selector -->
+          <div class="search-input-container">
+            <mat-form-field appearance="fill" class="search-field">
+              <mat-label>Select a country</mat-label>
+              <mat-select 
+                [(value)]="selectedCountry" 
+                (selectionChange)="onCountrySelected()"
+                panelClass="custom-select-panel"
+              >
+                <mat-option value="" disabled>
+                  <div class="select-placeholder">
+                    <span>Search for a country</span>
+                  </div>
+                </mat-option>
+                <mat-option *ngFor="let country of countries" [value]="country.value">
+                  <div class="country-option">
+                    <span class="country-name">{{ country.display }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix *ngIf="!isLoading">flag</mat-icon>
+              <mat-icon matSuffix *ngIf="isLoading">
+                <mat-spinner diameter="24" mode="indeterminate"></mat-spinner>
+              </mat-icon>
+            </mat-form-field>
+          </div>
 
-    <!-- Flag Display -->
-    <div class="flag-container" *ngIf="flagUrl; else noFlag">
-      <img [src]="flagUrl" alt="Selected country flag" class="flag-image" />
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="downloadFlag()"
-        class="download-button"
-        aria-label="Download flag image"
-      >
-        <mat-icon>download</mat-icon> Download Flag
-      </button>
+          <!-- Flag Display Section -->
+          <div class="flag-display-section" *ngIf="flagUrl || isLoading">
+            <div class="flag-container" *ngIf="flagUrl && !isLoading">
+              <div class="flag-wrapper">
+                <img 
+                  [src]="flagUrl" 
+                  [alt]="'Flag of ' + selectedCountry" 
+                  class="flag-image"
+                  [class.shadow]="isLargeScreen"
+                />
+              </div>
+              <div class="flag-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="downloadFlag()"
+                  class="download-button"
+                >
+                  <mat-icon>download</mat-icon> Download Flag
+                </button>
+                <div class="flag-info">
+                  <mat-icon>info</mat-icon>
+                  <span>Flag of {{ selectedCountry }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="loading-container" *ngIf="isLoading">
+              <mat-spinner diameter="50"></mat-spinner>
+              <p>Loading flag...</p>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state" *ngIf="!flagUrl && !isLoading">
+            <mat-icon class="empty-icon">flag</mat-icon>
+            <h3>No Flag Selected</h3>
+            <p>Please select a country from the dropdown to view its flag</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-
-    <!-- No Flag Selected -->
-    <ng-template #noFlag>
-      <div class="no-flag">
-        <mat-icon class="no-flag-icon">flag</mat-icon>
-        <p>Please select a country to view its flag.</p>
-      </div>
-    </ng-template>
-  </div>
+  </main>
 </div>

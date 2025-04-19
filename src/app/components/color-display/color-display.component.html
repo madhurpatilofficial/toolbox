@@ -1,25 +1,106 @@
-<!-- color-display.component.html -->
-<div class="color-container">
-  <div class="color-section">
-    <h2>Normal Colors</h2>
-    <div class="color-boxes">
-      <div *ngFor="let color of normalColors" class="color-box" (click)="onColorBoxClick($event, color)">
-        <div [style.background]="color"></div>
+<div class="color-app">
+  <header class="app-header">
+    <h1>Color Palette Explorer</h1>
+    <div class="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        placeholder="Search colors..." 
+        class="search-input"
+      >
+    </div>
+  </header>
+
+  <div class="tab-container">
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'normal'"
+      (click)="activeTab = 'normal'"
+    >
+      Solid Colors
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'gradient'"
+      (click)="activeTab = 'gradient'"
+    >
+      Gradients
+    </button>
+  </div>
+
+  <div class="color-grid-container">
+    <div *ngIf="activeTab === 'normal'" class="color-grid">
+      <div 
+        *ngFor="let color of filteredNormalColors" 
+        class="color-box"
+        (click)="onColorBoxClick($event, color)"
+      >
+        <div class="color-swatch" [style.background]="color"></div>
+        <div class="color-name">{{ getColorName(color) }}</div>
       </div>
     </div>
-  </div>
-  <div class="color-section">
-    <h2>Gradient Colors</h2>
-    <div class="gradient-colors">
-      <div *ngFor="let color of gradientColors" class="gradient-box" (click)="onColorBoxClick($event, color)">
-        <div [style.background]="color"></div>
+
+    <div *ngIf="activeTab === 'gradient'" class="gradient-grid">
+      <div 
+        *ngFor="let color of filteredGradientColors" 
+        class="gradient-box"
+        (click)="onColorBoxClick($event, color)"
+      >
+        <div class="gradient-swatch" [style.background]="color"></div>
+        <div class="gradient-name">Gradient</div>
       </div>
+    </div>
+
+    <div *ngIf="filteredNormalColors.length === 0 && activeTab === 'normal'" class="no-results">
+      No solid colors found matching "{{ searchTerm }}"
+    </div>
+    <div *ngIf="filteredGradientColors.length === 0 && activeTab === 'gradient'" class="no-results">
+      No gradients found matching "{{ searchTerm }}"
     </div>
   </div>
 
-  <div *ngIf="selectedColor" class="color-formats" [style.left.px]="formatLeft" [style.top.px]="formatTop">
-    <div class="close-button" (click)="selectedColor = null">&times;</div>
-    <h3>{{ selectedColor }}</h3>
-    <div class="format">{{ colorFormats[selectedColor] }}</div>
+  <div *ngIf="selectedColor" class="color-formats"
+       [style.left.px]="formatLeft"
+       [style.top.px]="formatTop"
+       [style.border-color]="selectedColor">
+    <div class="format-header">
+      <h3>{{ getColorName(selectedColor) }}</h3>
+      <button class="close-button" (click)="selectedColor = null">&times;</button>
+    </div>
+    
+    <div class="format-content">
+      <div class="format-row">
+        <span class="format-label">CSS:</span>
+        <span class="format-value">{{ selectedColor }}</span>
+        <button class="copy-button" (click)="copyToClipboard(selectedColor)">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div *ngIf="!selectedColor.startsWith('linear-gradient')" class="format-row">
+        <span class="format-label">RGB:</span>
+        <span class="format-value">{{ colorFormats[selectedColor]?.rgb }}</span>
+        <button class="copy-button" (click)="copyToClipboard(colorFormats[selectedColor]?.rgb || '')">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div *ngIf="!selectedColor.startsWith('linear-gradient')" class="format-row">
+        <span class="format-label">HEX:</span>
+        <span class="format-value">{{ colorFormats[selectedColor]?.hex }}</span>
+        <button class="copy-button" (click)="copyToClipboard(colorFormats[selectedColor]?.hex || '')">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 </div>

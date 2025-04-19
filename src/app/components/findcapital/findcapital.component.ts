@@ -4,6 +4,7 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/
 import { FindCapitalService } from '../../services/find-capital.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { trigger, transition, style, animate, state, query, stagger } from '@angular/animations';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-findcapital',
@@ -31,6 +32,12 @@ import { trigger, transition, style, animate, state, query, stagger } from '@ang
       state('inactive', style({ transform: 'scale(1)' })),
       transition('inactive => active', animate('300ms ease-in')),
       transition('active => inactive', animate('300ms ease-out'))
+    ]),
+    trigger('rotate', [
+      state('active', style({ transform: 'rotate(360deg)' })),
+      state('inactive', style({ transform: 'rotate(0deg)' })),
+      transition('inactive => active', animate('1000ms linear')),
+      transition('active => inactive', animate('0ms'))
     ])
   ]
 })
@@ -44,67 +51,79 @@ export class FindcapitalComponent implements OnInit {
   isSearching: boolean = false;
   showResults: boolean = false;
   pulseState: string = 'inactive';
-  recentSearches: {country: string, capital: string}[] = [];
+  recentSearches: {country: string, capital: string, flag: string}[] = [];
   countryFlag: string = '';
   countryInfo: any = null;
   themeMode: 'light' | 'dark' = 'light';
-  currentYear: number = new Date().getFullYear(); // Added currentYear property
-
+  currentYear: number = new Date().getFullYear();
+  rotateState: string = 'inactive';
+  searchInputFocused: boolean = false;
   
   protected searchTerm$ = new Subject<string>();
 
   constructor(
     private findCapitalService: FindCapitalService, 
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private snackBar: MatSnackBar
   ) { 
-    // Check system preference for dark mode
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.themeMode = prefersDark ? 'dark' : 'light';
+    this.applyTheme();
   }
 
   ngOnInit(): void {
-    // Responsive breakpoint observer
     this.breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small, 
       Breakpoints.Medium, 
       Breakpoints.Large, 
       Breakpoints.XLarge
-    ])
-      .subscribe(result => {
-        this.isLargeScreen = result.breakpoints[Breakpoints.Large] || 
-                            result.breakpoints[Breakpoints.XLarge];
-      });
+    ]).subscribe(result => {
+      this.isLargeScreen = result.breakpoints[Breakpoints.Large] || 
+                          result.breakpoints[Breakpoints.XLarge];
+    });
 
-    // Search pipeline
-    this.searchTerm$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap((term) => {
-          this.isSearching = true;
-          this.pulseState = 'active';
-          return this.findCapitalService.findCapital(term);
-        }),
-        catchError(error => {
-          this.handleFetchError(error);
-          return of([]);
-        })
-      )
-      .subscribe(
-        (data) => {
-          this.handleCountryData(data);
-          this.isSearching = false;
-          this.pulseState = 'inactive';
-          this.showResults = true;
-        }
-      );
-
-    // Fetch country names
+    this.setupSearchPipeline();
     this.fetchCountryNames();
-    
-    // Load saved searches from localStorage
     this.loadRecentSearches();
+  }
+
+  private setupSearchPipeline(): void {
+    this.searchTerm$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((term) => {
+        if (!term) return of(null);
+        
+        this.isSearching = true;
+        this.pulseState = 'active';
+        this.rotateState = 'active';
+        return this.findCapitalService.findCapital(term).pipe(
+          catchError(error => {
+            this.handleFetchError(error);
+            return of(null);
+          })
+        );
+      })
+    ).subscribe(
+      (data) => {
+        if (data) {
+          this.handleCountryData(data);
+        }
+        this.isSearching = false;
+        this.pulseState = 'inactive';
+        this.rotateState = 'inactive';
+        this.showResults = true;
+      }
+    );
+  }
+
+  private applyTheme(): void {
+    if (this.themeMode === 'dark') {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
   }
 
   fetchCountryNames(): void {
@@ -127,63 +146,94 @@ export class FindcapitalComponent implements OnInit {
     }
   }
 
-  private handleCountryData(data: any[]): void {
-    if (Array.isArray(data) && data.length > 0) {
-      const countryData = data[0];
-      this.countryInfo = countryData;
+  private handleCountryData(data: any): void {
+    if (!data || data.status === 404) {
+      this.handleNoCountryFound();
+      return;
+    }
+
+    try {
+      const countryData = Array.isArray(data) ? data[0] : data;
       
-      // Set country flag
+      if (!countryData || !countryData.name) {
+        this.handleNoCountryFound();
+        return;
+      }
+
+      this.countryInfo = countryData;
       this.countryFlag = countryData.flags?.svg || countryData.flags?.png || '';
       
-      if (this.selectedCountry === 'India') {
+      // Handle capital information
+      if (this.selectedCountry.toLowerCase() === 'india') {
         this.capital = 'New Delhi';
-      } else if ('capital' in countryData) {
+      } else if (countryData.capital) {
         this.capital = Array.isArray(countryData.capital) 
-          ? countryData.capital[0] || 'Capital information not available' 
-          : countryData.capital || 'Capital information not available';
+          ? countryData.capital[0] 
+          : countryData.capital;
       } else {
         this.capital = 'Capital information not available';
       }
       
       this.error = '';
-      
-      // Add to recent searches
       this.addToRecentSearches();
-    } else {
-      this.capital = '';
-      this.countryFlag = '';
-      this.countryInfo = null;
-      this.error = 'Country information not available for the specified name.';
+      
+      this.snackBar.open(`Found capital for ${this.selectedCountry}!`, 'Close', {
+        duration: 3000,
+        panelClass: ['success-snackbar']
+      });
+    } catch (error) {
+      this.handleFetchError(error);
     }
   }
 
-  private handleFetchError(error: any): void {
+  private handleNoCountryFound(): void {
     this.capital = '';
     this.countryFlag = '';
     this.countryInfo = null;
-    this.error = 'Error fetching data from the API.';
+    this.error = 'Country information not available for the specified name.';
+    
+    this.snackBar.open(this.error, 'Close', {
+      duration: 3000,
+      panelClass: ['error-snackbar']
+    });
+  }
+
+  private handleFetchError(error: any): void {
+    console.error('API Error:', error);
+    this.capital = '';
+    this.countryFlag = '';
+    this.countryInfo = null;
+    this.error = 'Error fetching data from the API. Please try again later.';
     this.isLoading = false;
     this.isSearching = false;
+    
+    this.snackBar.open(this.error, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
   }
 
   private addToRecentSearches(): void {
-    // Add current search to recent searches, avoiding duplicates
-    const existingIndex = this.recentSearches.findIndex(item => item.country === this.selectedCountry);
+    if (!this.selectedCountry || !this.capital) return;
+
+    const existingIndex = this.recentSearches.findIndex(item => 
+      item.country.toLowerCase() === this.selectedCountry.toLowerCase()
+    );
+    
     if (existingIndex !== -1) {
       this.recentSearches.splice(existingIndex, 1);
     }
     
     this.recentSearches.unshift({
       country: this.selectedCountry,
-      capital: this.capital
+      capital: this.capital,
+      flag: this.countryFlag
     });
     
-    // Keep only the last 5 searches
     if (this.recentSearches.length > 5) {
       this.recentSearches = this.recentSearches.slice(0, 5);
     }
     
-    // Save to localStorage
     localStorage.setItem('recentCapitalSearches', JSON.stringify(this.recentSearches));
   }
   
@@ -205,31 +255,24 @@ export class FindcapitalComponent implements OnInit {
   
   toggleTheme(): void {
     this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
-    document.body.classList.toggle('dark-theme');
+    this.applyTheme();
   }
   
   getFormattedPopulation(): string {
-    if (!this.countryInfo || !this.countryInfo.population) {
-      return 'Unknown';
-    }
+    if (!this.countryInfo?.population) return 'Unknown';
     return new Intl.NumberFormat().format(this.countryInfo.population);
   }
   
   getCurrencies(): string {
-    if (!this.countryInfo || !this.countryInfo.currencies) {
-      return 'Unknown';
-    }
+    if (!this.countryInfo?.currencies) return 'Unknown';
     
     return Object.values(this.countryInfo.currencies)
-      .map((curr: any) => `${curr.name} (${curr.symbol || ''})`)
+      .map((curr: any) => `${curr.name} (${curr.symbol || '—'})`)
       .join(', ');
   }
   
   getLanguages(): string {
-    if (!this.countryInfo || !this.countryInfo.languages) {
-      return 'Unknown';
-    }
-    
+    if (!this.countryInfo?.languages) return 'Unknown';
     return Object.values(this.countryInfo.languages).join(', ');
   }
   
@@ -240,5 +283,28 @@ export class FindcapitalComponent implements OnInit {
     this.countryInfo = null;
     this.error = '';
     this.showResults = false;
+  }
+  
+  getRegionInfo(): string {
+    if (!this.countryInfo) return 'Unknown';
+    
+    const regionParts = [];
+    if (this.countryInfo.region) regionParts.push(this.countryInfo.region);
+    if (this.countryInfo.subregion) regionParts.push(this.countryInfo.subregion);
+    
+    return regionParts.join(' • ') || 'Unknown';
+  }
+  
+  getTimezones(): string {
+    if (!this.countryInfo?.timezones) return 'Unknown';
+    return this.countryInfo.timezones.join(', ');
+  }
+  
+  onSearchFocus(): void {
+    this.searchInputFocused = true;
+  }
+  
+  onSearchBlur(): void {
+    this.searchInputFocused = false;
   }
 }

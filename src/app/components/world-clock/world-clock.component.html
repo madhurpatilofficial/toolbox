@@ -1,76 +1,127 @@
-<div class="container">
-  <!-- Header -->
-  <header class="header">
-    <h1 class="header-title">World Clock</h1>
-    <p class="header-subtitle">Select a country to view its current time</p>
-  </header>
+<div class="world-clock-container">
 
   <!-- Main Content -->
-  <div class="card">
-    <!-- Country Selector -->
-    <mat-form-field appearance="outline" class="country-selector" floatLabel="always">
-      <mat-label>Choose a Country</mat-label>
-      <mat-select
-        [(ngModel)]="selectedCountryCode"
-        (selectionChange)="onCountryChange()"
-        aria-label="Select a country"
-        placeholder="Select a country"
-      >
-        <mat-option value="">Select a country</mat-option>
-        <mat-option *ngFor="let country of countries" [value]="country.code">
-          {{ country.name }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+  <main class="clock-main">
+    <!-- Country Selector Card -->
+    <mat-card class="selector-card">
+      <mat-card-header>
+        <mat-card-title>Select Location</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="fill" class="country-selector">
+          <mat-label>Country</mat-label>
+          <mat-select
+            [(ngModel)]="selectedCountryCode"
+            (selectionChange)="onCountryChange()"
+            panelClass="country-select-panel"
+          >
+            <mat-option value="">
+              <em>Select a country</em>
+            </mat-option>
+            <mat-option *ngFor="let country of countries" [value]="country.code">
+              <span class="flag-icon flag-icon-{{country.code.toLowerCase()}}"></span>
+              {{ country.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
 
-    <!-- Error Message -->
-    <div *ngIf="errorMessage" class="error-message">
-      <mat-icon class="error-icon">error_outline</mat-icon>
-      <p>{{ errorMessage }}</p>
+    <!-- Error State -->
+    <div *ngIf="errorMessage" class="error-state">
+      <mat-card class="error-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            Error
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ errorMessage }}</p>
+          <button mat-stroked-button color="warn" (click)="selectedCountryCode = ''; errorMessage = ''">
+            Try Again
+          </button>
+        </mat-card-content>
+      </mat-card>
     </div>
 
-    <!-- Clock and Time Display -->
-    <div *ngIf="!errorMessage && selectedCountryCode" class="clock-section">
-      <!-- Analog Clock -->
-      <div class="clock-container">
-        <div class="clock">
-          <!-- Clock Face -->
-          <div class="clock-face"></div>
-          <!-- Clock Numbers -->
-          <div class="number" style="--angle: 30;" data-position>1</div>
-          <div class="number" style="--angle: 60;" data-position>2</div>
-          <div class="number" style="--angle: 90;" data-position>3</div>
-          <div class="number" style="--angle: 120;" data-position>4</div>
-          <div class="number" style="--angle: 150;" data-position>5</div>
-          <div class="number" style="--angle: 180;" data-position>6</div>
-          <div class="number" style="--angle: 210;" data-position>7</div>
-          <div class="number" style="--angle: 240;" data-position>8</div>
-          <div class="number" style="--angle: 270;" data-position>9</div>
-          <div class="number" style="--angle: 300;" data-position>10</div>
-          <div class="number" style="--angle: 330;" data-position>11</div>
-          <div class="number" style="--angle: 0;" data-position>12</div>
-          
-          
-          <!-- Clock Hands -->
-          <div class="hour-hand" [style.transform]="getHourRotation()"></div>
-          <div class="minute-hand" [style.transform]="getMinuteRotation()"></div>
-          <div class="second-hand" [style.transform]="getSecondRotation()"></div>
-          <!-- Center Dot -->
-          <div class="center-dot"></div>
-        </div>
-      </div>
+    <!-- Clock Display -->
+    <div *ngIf="!errorMessage && selectedCountryCode" class="clock-display">
+      <mat-card class="clock-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>schedule</mat-icon>
+            Current Time
+          </mat-card-title>
+          <mat-card-subtitle>{{ timezone }}</mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content class="clock-content">
+          <!-- Analog Clock -->
+          <div class="analog-clock-container">
+            <div class="clock">
+              <div class="clock-face">
+                <!-- Clock Numbers -->
+                <div class="clock-number" style="--angle: 0deg;">12</div>
+                <div class="clock-number" style="--angle: 30deg;">1</div>
+                <div class="clock-number" style="--angle: 60deg;">2</div>
+                <div class="clock-number" style="--angle: 90deg;">3</div>
+                <div class="clock-number" style="--angle: 120deg;">4</div>
+                <div class="clock-number" style="--angle: 150deg;">5</div>
+                <div class="clock-number" style="--angle: 180deg;">6</div>
+                <div class="clock-number" style="--angle: 210deg;">7</div>
+                <div class="clock-number" style="--angle: 240deg;">8</div>
+                <div class="clock-number" style="--angle: 270deg;">9</div>
+                <div class="clock-number" style="--angle: 300deg;">10</div>
+                <div class="clock-number" style="--angle: 330deg;">11</div>
+                
+                <!-- Minute Ticks -->
+                <div class="minute-tick" *ngFor="let tick of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]" 
+                     style="--tick-angle: {{tick * 6}}deg;"></div>
+                
+                <!-- Clock Hands -->
+                <div class="hand hour-hand" [style.transform]="getHourRotation()"></div>
+                <div class="hand minute-hand" [style.transform]="getMinuteRotation()"></div>
+                <div class="hand second-hand" [style.transform]="getSecondRotation()"></div>
+                
+                <!-- Center Dot -->
+                <div class="center-dot"></div>
+              </div>
+            </div>
+          </div>
 
-      <!-- Digital Time and Timezone -->
-      <div class="time-info">
-        <p class="time-text"><span>Current Time:</span> {{ getFormattedTime() }}</p>
-        <p class="timezone"><span>Timezone:</span> {{ timezone }}</p>
-      </div>
+          <!-- Digital Clock -->
+          <div class="digital-clock">
+            <div class="time-display">
+              {{ getFormattedTime() }}
+            </div>
+            <div class="date-display" *ngIf="isLargeScreen">
+              {{ getCurrentDate() }}
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
 
-    <!-- No Selection State -->
-    <div *ngIf="!selectedCountryCode && !errorMessage" class="no-selection">
-      <mat-icon class="no-selection-icon">access_time</mat-icon>
-      <p>Please select a country to view its time.</p>
+    <!-- Empty State -->
+    <div *ngIf="!selectedCountryCode && !errorMessage" class="empty-state">
+      <mat-card class="empty-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>access_time</mat-icon>
+            No Country Selected
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Select a country from the dropdown above to view its current time</p>
+          <div class="example-countries">
+            <span class="example-text">Try:</span>
+            <button mat-button (click)="selectedCountryCode = 'US'; onCountryChange()">United States</button>
+            <button mat-button (click)="selectedCountryCode = 'GB'; onCountryChange()">United Kingdom</button>
+            <button mat-button (click)="selectedCountryCode = 'JP'; onCountryChange()">Japan</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-  </div>
+  </main>
 </div>

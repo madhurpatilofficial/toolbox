@@ -4,6 +4,7 @@ import { saveAs } from 'file-saver';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-findflag',
   templateUrl: './findflag.component.html',
@@ -207,29 +208,72 @@ export class FindflagComponent implements OnInit {
 
   ];
 
+
   flagUrl: string = '';
-  private searchTerm$ = new Subject<string>();
+  isLoading: boolean = false;
   isLargeScreen: boolean = false;
+  themeMode: 'light' | 'dark' = 'light';
+  currentYear: number = new Date().getFullYear();
+  
+  private searchTerm$ = new Subject<string>();
 
-  constructor(private http: HttpClient, private breakpointObserver: BreakpointObserver) { }
-
+  constructor(
+    private http: HttpClient, 
+    private breakpointObserver: BreakpointObserver,
+    private snackBar: MatSnackBar
+  ) { }
 
   ngOnInit(): void {
-    this.searchTerm$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap(term => this.fetchFlagUrl(term)),
-        catchError(() => of('')) // Error handling
-      )
-      .subscribe(flagUrl => {
-        this.flagUrl = flagUrl;
-      });
+    // Check system preference for dark mode
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.themeMode = prefersDark ? 'dark' : 'light';
+    this.applyTheme();
 
-      this.breakpointObserver.observe([Breakpoints.Large, Breakpoints.XLarge])
-      .subscribe(result => {
-        this.isLargeScreen = result.matches;
-      });
+    // Setup search pipeline
+    this.setupSearchPipeline();
+
+    // Responsive breakpoint observer
+    this.breakpointObserver.observe([
+      Breakpoints.Large, 
+      Breakpoints.XLarge
+    ]).subscribe(result => {
+      this.isLargeScreen = result.matches;
+    });
+  }
+
+  private setupSearchPipeline(): void {
+    this.searchTerm$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (!term) return of('');
+        this.isLoading = true;
+        return this.fetchFlagUrl(term).pipe(
+          catchError(error => {
+            this.handleError(error);
+            return of('');
+          })
+        );
+      })
+    ).subscribe(flagUrl => {
+      this.flagUrl = flagUrl;
+      this.isLoading = false;
+      
+      if (flagUrl && this.selectedCountry) {
+        this.snackBar.open(`Flag loaded for ${this.selectedCountry}`, 'Close', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+      }
+    });
+  }
+
+  private applyTheme(): void {
+    if (this.themeMode === 'dark') {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
   }
 
   onCountrySelected(): void {
@@ -237,25 +281,38 @@ export class FindflagComponent implements OnInit {
   }
 
   private fetchFlagUrl(countryName: string): Observable<string> {
-    if (!countryName) {
-      return of('');
-    }
-    
     const apiUrl = `https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}`;
     return this.http.get<any[]>(apiUrl).pipe(
       map(data => {
         if (Array.isArray(data) && data.length > 0 && data[0].flags) {
-          return data[0].flags.png;
-        } else {
-          return '';
+          return data[0].flags.png || data[0].flags.svg || '';
         }
+        return '';
       })
     );
   }
 
+  private handleError(error: any): void {
+    this.isLoading = false;
+    this.snackBar.open('Error loading flag. Please try again.', 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
+    console.error('API Error:', error);
+  }
+
   downloadFlag(): void {
     if (this.flagUrl) {
-      saveAs(this.flagUrl, 'country_flag.png');
+      saveAs(this.flagUrl, `${this.selectedCountry.replace(/\s+/g, '_')}_flag.png`);
+      this.snackBar.open('Download started!', 'Close', {
+        duration: 3000,
+        panelClass: ['success-snackbar']
+      });
     }
+  }
+
+  toggleTheme(): void {
+    this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
+    this.applyTheme();
   }
 }

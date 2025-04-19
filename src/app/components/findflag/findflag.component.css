@@ -1,132 +1,267 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
-:host {
-  display: block;
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
+/* Light theme variables (approximated from Angular Material indigo palette) */
+:root {
+  --primary-color: #3f51b5;
+  --primary-light: #757de8;
+  --primary-dark: #002984;
+  --accent-color: #ff4081;
+  --accent-light: #ff80ab;
+  --accent-dark: #f50057;
+  --warn-color: #f44336;
+  --warn-light: #ff7961;
+  --warn-dark: #ba000d;
+  --background-color: #f5f5f5;
+  --text-color: rgba(0, 0, 0, 0.87);
 }
 
-/* Container */
-.container {
+/* Dark theme variables (approximated from Angular Material blue-grey palette) */
+.dark-theme {
+  --primary-color: #607d8b;
+  --primary-light: #8eacbb;
+  --primary-dark: #34515e;
+  --accent-color: #ffb300;
+  --accent-light: #ffe97d;
+  --accent-dark: #c68400;
+  --warn-color: #ff5722;
+  --warn-light: #ff8a50;
+  --warn-dark: #c41c00;
+  --background-color: #303030;
+  --text-color: white;
+}
+
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  transition: background-color 0.3s ease;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+}
+
+.app-container.dark-theme {
+  background-color: #303030;
+  color: white;
+}
+
+.app-header {
+  background: linear-gradient(135deg, #3f51b5 0%, #2196f3 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+}
+
+.app-header .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  width: 100%;
 }
 
-/* Header */
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
+.app-header .header-content .logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.header-title {
+.app-header .header-content .logo-container .logo-icon {
   font-size: 2rem;
-  font-weight: 600;
-  color: #1e293b;
+  width: 2rem;
+  height: 2rem;
+}
+
+.app-header .header-content .logo-container .app-title {
   margin: 0;
+  font-weight: 500;
 }
 
-.header-subtitle {
-  font-size: 1rem;
-  color: #64748b;
-  margin-top: 0.5rem;
+.app-content {
+  flex: 1;
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-/* Card */
-.card {
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-  padding: 2rem;
-  max-width: 600px;
+.app-content .search-section {
+  max-width: 800px;
   margin: 0 auto;
 }
 
-/* Country Selector */
-.country-selector {
+.app-content .search-section .search-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.app-content .search-section .search-card .search-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-content .search-section .search-card .search-title .section-icon {
+  color: #3f51b5;
+}
+
+.app-content .search-section .search-card .search-input-container {
+  margin: 1rem 0;
+}
+
+.app-content .search-section .search-card .search-input-container .search-field {
   width: 100%;
-  margin-bottom: 1.5rem;
 }
 
-.country-selector .mat-form-field {
-  font-size: 1rem;
+.app-content .search-section .search-card .flag-display-section {
+  margin-top: 2rem;
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.country-selector .mat-select {
-  font-weight: 500;
-  color: #1e293b;
-}
-
-/* Flag Container */
-.flag-container {
+.app-content .search-section .search-card .flag-display-section .flag-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  width: 100%;
 }
 
-.flag-image {
-  max-width: 100%;
+.app-content .search-section .search-card .flag-display-section .flag-container .flag-wrapper {
+  max-width: 500px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.app-content .search-section .search-card .flag-display-section .flag-container .flag-wrapper .flag-image {
+  width: 100%;
   height: auto;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  display: block;
+  border: 1px solid #e0e0e0;
 }
 
-.flag-image:hover {
-  transform: scale(1.02);
+.app-content .search-section .search-card .flag-display-section .flag-container .flag-wrapper .flag-image.shadow {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* Download Button */
-.download-button {
-  background-color: #2563eb;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+.app-content .search-section .search-card .flag-display-section .flag-container .flag-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.app-content .search-section .search-card .flag-display-section .flag-container .flag-actions .download-button {
+  padding: 0.5rem 2rem;
   font-weight: 500;
-  text-transform: uppercase;
-  transition: background-color 0.3s ease;
 }
 
-.download-button:hover {
-  background-color: #1d4ed8;
+.app-content .search-section .search-card .flag-display-section .flag-container .flag-actions .flag-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
 }
 
-.download-button mat-icon {
-  margin-right: 0.5rem;
+.app-content .search-section .search-card .flag-display-section .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(0, 0, 0, 0.6);
 }
 
-/* No Flag State */
-.no-flag {
+.app-content .search-section .search-card .flag-display-section .loading-container p {
+  margin: 0;
+}
+
+.app-content .search-section .search-card .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 0;
   text-align: center;
-  color: #64748b;
-  padding: 2rem;
+  color: rgba(0, 0, 0, 0.6);
 }
 
-.no-flag-icon {
+.app-content .search-section .search-card .empty-state .empty-icon {
   font-size: 3rem;
-  height: 3rem;
   width: 3rem;
-  color: #94a3b8;
-  margin-bottom: 1rem;
+  height: 3rem;
+  opacity: 0.5;
 }
 
-/* Responsive Design */
+.app-content .search-section .search-card .empty-state h3 {
+  margin: 0;
+  font-weight: 500;
+}
+
+.app-content .search-section .search-card .empty-state p {
+  margin: 0;
+}
+
+.app-footer {
+  padding: 1rem;
+  background: #f5f5f5;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.app-footer .footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.app-footer .footer-content .footer-info p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.app-footer .footer-content .footer-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.dark-theme .app-footer {
+  background: #424242;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dark-theme .search-card {
+  background: #424242;
+  color: white;
+}
+
+.dark-theme .flag-info,
+.dark-theme .empty-state {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark-theme .flag-image {
+  border-color: #616161 !important;
+}
+
 @media (max-width: 600px) {
-  .container {
-    padding: 1rem;
+  .app-header .header-content {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
   }
 
-  .card {
-    padding: 1.5rem;
-  }
-
-  .header-title {
-    font-size: 1.5rem;
-  }
-
-  .header-subtitle {
-    font-size: 0.875rem;
+  .app-footer .footer-content {
+    flex-direction: column;
+    text-align: center;
   }
 }

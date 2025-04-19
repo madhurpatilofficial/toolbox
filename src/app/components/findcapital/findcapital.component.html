@@ -1,54 +1,117 @@
-<div class="container">
-  <!-- Header Section -->
-  <div class="header" [ngClass]="{'large-screen': isLargeScreen}">
-    <mat-card class="title-card" appearance="outlined">
-      <mat-card-header>
-        <mat-card-title>Discover Capitals</mat-card-title>
-        <mat-card-subtitle>Find the capital city of any country</mat-card-subtitle>
-      </mat-card-header>
-    </mat-card>
-  </div>
+<div class="app-container" [class.dark-theme]="themeMode === 'dark'">
 
   <!-- Main Content -->
-  <div class="content">
-    <mat-card class="search-card" appearance="outlined">
-      <mat-card-content>
-        <!-- Search Input -->
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Choose a Country</mat-label>
-          <mat-select 
-            [(value)]="selectedCountry" 
-            (selectionChange)="onCountrySelected()"
-            [disabled]="isLoading"
-            panelClass="custom-select-panel"
-          >
-            <mat-option value="" disabled>Select a country</mat-option>
-            <mat-option *ngIf="isLoading" value="" disabled>
-              <mat-spinner diameter="20" class="inline-spinner"></mat-spinner> Loading countries...
-            </mat-option>
-            <mat-option *ngFor="let country of countryNames" [value]="country">
-              {{ country }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Loading Indicator -->
-        <div class="loading-container" *ngIf="isLoading && selectedCountry">
-          <mat-spinner diameter="40"></mat-spinner>
-        </div>
-
-        <!-- Result Display -->
-        <div class="result-container" *ngIf="!isLoading && (capital || error)">
-          <div class="result-card" *ngIf="capital && !error" @fadeIn>
-            <h3>Capital City</h3>
-            <p class="capital">{{ capital }}</p>
+  <main class="app-content">
+    <div class="search-section">
+      <mat-card class="search-card" appearance="outlined" [class.search-focused]="searchInputFocused">
+        <mat-card-header>
+          <mat-card-title class="search-title">
+            <mat-icon class="section-icon">search</mat-icon>
+            Find a Country's Capital
+          </mat-card-title>
+          <mat-card-subtitle>Discover capitals, flags, and country information</mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <!-- Search Input -->
+          <div class="search-input-container">
+            <mat-form-field appearance="fill" class="search-field">
+              <mat-label>Select a country</mat-label>
+              <mat-select 
+                [(value)]="selectedCountry" 
+                (selectionChange)="onCountrySelected()"
+                [disabled]="isLoading"
+                panelClass="custom-select-panel"
+                (opened)="onSearchFocus()"
+                (closed)="onSearchBlur()"
+              >
+                <mat-option value="" disabled>
+                  <div class="select-placeholder">
+                    <span>Search for a country</span>
+                  </div>
+                </mat-option>
+                <mat-option *ngIf="isLoading" value="" disabled>
+                  <div class="loading-option">
+                    <mat-spinner diameter="20" class="inline-spinner"></mat-spinner> 
+                    <span>Loading countries...</span>
+                  </div>
+                </mat-option>
+                <mat-option *ngFor="let country of countryNames" [value]="country">
+                  <div class="country-option">
+                    <span class="country-name">{{ country }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix *ngIf="!isSearching">search</mat-icon>
+              <mat-icon matSuffix *ngIf="isSearching">
+                <mat-spinner diameter="24" mode="indeterminate"></mat-spinner>
+              </mat-icon>
+            </mat-form-field>
           </div>
-          <div class="error-card" *ngIf="error" @fadeIn>
-            <mat-icon>error_outline</mat-icon>
-            <p>{{ error }}</p>
+
+          <!-- Results Section -->
+          <div class="results-section" *ngIf="showResults && (capital || error)" @fadeIn>
+            <!-- Success Result -->
+            <div class="result-card success" *ngIf="capital && !error">
+              <div class="result-header">
+                <h2 class="result-title">
+                  <mat-icon class="result-icon">location_city</mat-icon>
+                  Capital of {{ selectedCountry }}
+                </h2>
+                <div class="country-flag" *ngIf="countryFlag">
+                  <img [src]="countryFlag" [alt]="'Flag of ' + selectedCountry" />
+                </div>
+              </div>
+              
+              <div class="capital-display">
+                <span class="capital-name">{{ capital }}</span>
+                <mat-icon class="verified-icon" matTooltip="Verified information">verified</mat-icon>
+              </div>
+              
+              <!-- Country Details -->
+              <div class="country-details" *ngIf="countryInfo">
+                <div class="detail-row">
+                  <mat-icon>people</mat-icon>
+                  <span><strong>Population:</strong> {{ getFormattedPopulation() }}</span>
+                </div>
+                
+                <div class="detail-row">
+                  <mat-icon>language</mat-icon>
+                  <span><strong>Languages:</strong> {{ getLanguages() }}</span>
+                </div>
+                
+                <div class="detail-row">
+                  <mat-icon>payments</mat-icon>
+                  <span><strong>Currency:</strong> {{ getCurrencies() }}</span>
+                </div>
+                
+                <div class="detail-row">
+                  <mat-icon>map</mat-icon>
+                  <span><strong>Region:</strong> {{ getRegionInfo() }}</span>
+                </div>
+                
+                <div class="detail-row">
+                  <mat-icon>schedule</mat-icon>
+                  <span><strong>Timezones:</strong> {{ getTimezones() }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Error Result -->
+            <div class="result-card error" *ngIf="error">
+              <div class="error-content">
+                <mat-icon class="error-icon">error_outline</mat-icon>
+                <h3>We couldn't find that country</h3>
+                <p>{{ error }}</p>
+                <button mat-stroked-button color="warn" (click)="resetSearch()">
+                  <mat-icon>refresh</mat-icon>
+                  Try Again
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </main>
 </div>

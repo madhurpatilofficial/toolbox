@@ -1,5 +1,4 @@
-// color-display.component.ts
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-color-display',
@@ -8,6 +7,11 @@ import { Component } from '@angular/core';
 })
 export class ColorDisplayComponent {
   selectedColor: string | null = null;
+  searchTerm = '';
+  activeTab: 'normal' | 'gradient' = 'normal';
+  formatLeft = 0;
+  formatTop = 0;
+  colorFormats: { [key: string]: { name: string; rgb: string; hex: string } } = {};
 
   normalColors: string[] = [
     'red', 'green', 'blue', 'black', 'yellow', 'purple', 'cyan', 'magenta', 'orange', 'brown',
@@ -25,6 +29,7 @@ export class ColorDisplayComponent {
     'sandybrown', 'seagreen', 'seashell', 'sienna', 'silver', 'skyblue', 'slateblue', 'slategray', 'snow', 'springgreen',
     'steelblue', 'tan', 'thistle', 'tomato', 'turquoise', 'violet', 'wheat', 'whitesmoke', 'yellowgreen'
   ];
+
 
   gradientColors: string[] = [
     'linear-gradient(90deg, #ffd700, #8b4513)',
@@ -189,37 +194,114 @@ export class ColorDisplayComponent {
     'linear-gradient(90deg, #da70d6, #00fa9a)',
     'linear-gradient(90deg, #800080, #ff8c00)'
   ];
-  colorFormats: { [key: string]: string } = {};
-
-  formatLeft = 0;
-  formatTop = 0;
 
   constructor() {
-    // Initialize color formats for normal colors
+    // Initialize color formats
+    this.initializeColorFormats();
+  }
+
+  initializeColorFormats(): void {
+    // Normal colors
     this.normalColors.forEach(color => {
-      this.getColorFormat(color);
+      this.colorFormats[color] = this.calculateColorFormats(color);
     });
 
-    // Initialize color formats for gradient colors
-    this.gradientColors.forEach(color => {
-      this.getColorFormat(color, true);
+    // Gradient colors
+    this.gradientColors.forEach(gradient => {
+      this.colorFormats[gradient] = {
+        name: gradient,
+        rgb: gradient,
+        hex: gradient
+      };
     });
   }
 
-  getColorFormat(color: string, isGradient: boolean = false): void {
+  calculateColorFormats(color: string): { name: string; rgb: string; hex: string } {
     const dummyElement = document.createElement('div');
-    dummyElement.style.color = isGradient ? 'initial' : color;
-    dummyElement.style.background = color;
+    dummyElement.style.color = color;
+    dummyElement.style.display = 'none';
     document.body.appendChild(dummyElement);
+    
     const computedColor = getComputedStyle(dummyElement).color;
     document.body.removeChild(dummyElement);
-    this.colorFormats[color] = computedColor;
+
+    return {
+      name: color,
+      rgb: computedColor,
+      hex: this.rgbToHex(computedColor)
+    };
+  }
+
+  rgbToHex(rgb: string): string {
+    // Extract RGB values
+    const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    if (!match) return rgb;
+    
+    const r = parseInt(match[1], 10);
+    const g = parseInt(match[2], 10);
+    const b = parseInt(match[3], 10);
+    
+    return '#' + [r, g, b].map(x => {
+      const hex = x.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
+  }
+
+  get filteredNormalColors(): string[] {
+    return this.normalColors.filter(color => 
+      color.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+  get filteredGradientColors(): string[] {
+    return this.gradientColors.filter(color => 
+      color.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.color-formats') && !target.closest('.color-box') && !target.closest('.gradient-box')) {
+      this.selectedColor = null;
+    }
   }
 
   onColorBoxClick(event: MouseEvent, color: string): void {
+    event.stopPropagation();
     this.selectedColor = color;
+    
+    // Position the format box
+    const x = event.clientX;
+    const y = event.clientY;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    this.formatLeft = x + 250 > windowWidth ? windowWidth - 250 : x;
+    this.formatTop = y + 200 > windowHeight ? windowHeight - 200 : y;
+  }
 
-    this.formatLeft = event.clientX;
-    this.formatTop = event.clientY;
+  copyToClipboard(text: string): void {
+    if (!text) return;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      const tooltip = document.createElement('div');
+      tooltip.className = 'copy-tooltip';
+      tooltip.textContent = 'Copied!';
+      tooltip.style.position = 'fixed';
+      tooltip.style.left = `${this.formatLeft + 20}px`;
+      tooltip.style.top = `${this.formatTop - 30}px`;
+      document.body.appendChild(tooltip);
+      
+      setTimeout(() => {
+        document.body.removeChild(tooltip);
+      }, 1000);
+    });
+  }
+
+  getColorName(color: string): string {
+    return color.startsWith('linear-gradient') ? 
+      'Gradient' : 
+      color.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
   }
 }

@@ -137,4 +137,15 @@ export class WorldClockComponent implements OnInit, OnDestroy {
     const ampm = this.hours < 12 ? 'AM' : 'PM'; // Determine AM/PM
     return `${pad(hours12)}:${pad(this.minutes)}:${pad(this.seconds)} ${ampm}`;
   }
+  
+  getCurrentDate(): string {
+    const now = new Date();
+    return now.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+
 }
