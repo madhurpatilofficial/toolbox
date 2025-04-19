@@ -1,135 +1,132 @@
-/* findflag.component.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-/* Container styles */
-div {
+:host {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.header-subtitle {
+  font-size: 1rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+/* Card */
+.card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
   max-width: 600px;
-  margin: 60px auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); */
-  box-shadow: 0 4px 6px rgb(0 14 252 / 30%);
-  background-color: #addcfd;
-  color: #000000;
+  margin: 0 auto;
+}
+
+/* Country Selector */
+.country-selector {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.country-selector .mat-form-field {
+  font-size: 1rem;
+}
+
+.country-selector .mat-select {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+/* Flag Container */
+.flag-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  
+  gap: 1.5rem;
 }
 
-/* Label styles */
-label {
-  display: block;
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-/* Select styles */
-select {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 15px;
-  border: none;
-  border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #000000;
-}
-
-/* Image styles */
-img {
+.flag-image {
   max-width: 100%;
   height: auto;
-  margin-top: 10px;
-  margin-bottom: 15px;
-  /* Added margin between flag and button */
-  border-radius: 12px;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
-/* Button styles */
-button {
-  display: block;
-  padding: 10px 15px;
-  font-size: 16px;
-  border-radius: 12px;
-  background: white;
-  color: #000000;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
+.flag-image:hover {
+  transform: scale(1.02);
 }
 
-button:hover {
-  background: linear-gradient(to bottom right, #e98b07, #27f67d);
-}
-
-.custom-width {
-  width: 500px;
-  margin-left: 5rem;
-  margin-top: 1rem;
-}
-
-.custom-width .mat-form-field-flex {
-  width: 100%;
-}
-
-/* Responsive styles */
-@media (max-width: 600px) {
-  div {
-    max-width: 100%;
-    margin: 10px;
-  }
-}
-
-@media (max-width: 400px) {
-  select,
-  button {
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 555px) {
-  .custom-width {
-    max-width: 100%;
-    margin-left: 5rem;
-  }
-}
-
-@media (min-width: 412px) {
-  .custom-width {
-    max-width: 100%;
-    margin-right: 5rem;
-  }
-}
-
-@media (min-width: 390px) {
-  .custom-width {
-    max-width: 100%;
-    margin-right: 5rem;
-  }
-}
-
-@media (min-width: 375px) {
-  .custom-width {
-    max-width: 100%;
-    margin-right: 5rem;
-  }
-}
-
-h2 {
-  font-size: 1.5rem;
+/* Download Button */
+.download-button {
+  background-color: #2563eb;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   font-weight: 500;
-  text-align: center;
-  margin-top: 20px;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
 }
-.title-box {
-  background-color: #f5f5f5;
-  color: #000000;
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgb(0 14 252 / 30%);
-  margin-bottom: 1rem;
+
+.download-button:hover {
+  background-color: #1d4ed8;
+}
+
+.download-button mat-icon {
+  margin-right: 0.5rem;
+}
+
+/* No Flag State */
+.no-flag {
   text-align: center;
-  
+  color: #64748b;
+  padding: 2rem;
+}
+
+.no-flag-icon {
+  font-size: 3rem;
+  height: 3rem;
+  width: 3rem;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.875rem;
+  }
 }

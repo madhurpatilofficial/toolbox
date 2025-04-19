@@ -1,55 +1,76 @@
 <div class="container">
-  <div class="title" *ngIf="isLargeScreen">
-    <h2>World Clock</h2>
-  </div>
+  <!-- Header -->
+  <header class="header">
+    <h1 class="header-title">World Clock</h1>
+    <p class="header-subtitle">Select a country to view its current time</p>
+  </header>
 
-  <div class="background-container">
-    <div class="world-clock">
-      <mat-form-field appearance="fill" class="custom-width">
-        <mat-label>Select a country</mat-label>
-        <mat-select [(ngModel)]="selectedCountryCode" (selectionChange)="onCountryChange()">
-          <mat-option value="">Select a country</mat-option>
-          <mat-option *ngFor="let country of countries" [value]="country.code">
-            {{ country.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+  <!-- Main Content -->
+  <div class="card">
+    <!-- Country Selector -->
+    <mat-form-field appearance="outline" class="country-selector" floatLabel="always">
+      <mat-label>Choose a Country</mat-label>
+      <mat-select
+        [(ngModel)]="selectedCountryCode"
+        (selectionChange)="onCountryChange()"
+        aria-label="Select a country"
+        placeholder="Select a country"
+      >
+        <mat-option value="">Select a country</mat-option>
+        <mat-option *ngFor="let country of countries" [value]="country.code">
+          {{ country.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-      <div *ngIf="errorMessage" class="error-message">
-        <p>{{ errorMessage }}</p>
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <!-- Clock and Time Display -->
+    <div *ngIf="!errorMessage && selectedCountryCode" class="clock-section">
+      <!-- Analog Clock -->
+      <div class="clock-container">
+        <div class="clock">
+          <!-- Clock Face -->
+          <div class="clock-face"></div>
+          <!-- Clock Numbers -->
+          <div class="number" style="--angle: 30;" data-position>1</div>
+          <div class="number" style="--angle: 60;" data-position>2</div>
+          <div class="number" style="--angle: 90;" data-position>3</div>
+          <div class="number" style="--angle: 120;" data-position>4</div>
+          <div class="number" style="--angle: 150;" data-position>5</div>
+          <div class="number" style="--angle: 180;" data-position>6</div>
+          <div class="number" style="--angle: 210;" data-position>7</div>
+          <div class="number" style="--angle: 240;" data-position>8</div>
+          <div class="number" style="--angle: 270;" data-position>9</div>
+          <div class="number" style="--angle: 300;" data-position>10</div>
+          <div class="number" style="--angle: 330;" data-position>11</div>
+          <div class="number" style="--angle: 0;" data-position>12</div>
+          
+          
+          <!-- Clock Hands -->
+          <div class="hour-hand" [style.transform]="getHourRotation()"></div>
+          <div class="minute-hand" [style.transform]="getMinuteRotation()"></div>
+          <div class="second-hand" [style.transform]="getSecondRotation()"></div>
+          <!-- Center Dot -->
+          <div class="center-dot"></div>
+        </div>
       </div>
 
-      <div *ngIf="!errorMessage && selectedCountryCode">
-        <div class="clock-container">
-          <div class="clock">
-            <!-- Clock Numbers -->
-            <div class="number number-1">1</div>
-            <div class="number number-2">2</div>
-            <div class="number number-3">3</div>
-            <div class="number number-4">4</div>
-            <div class="number number-5">5</div>
-            <div class="number number-6">6</div>
-            <div class="number number-7">7</div>
-            <div class="number number-8">8</div>
-            <div class="number number-9">9</div>
-            <div class="number number-10">10</div>
-            <div class="number number-11">11</div>
-            <div class="number number-12">12</div>
-
-            <!-- Clock Hands -->
-            <div class="hour-hand" [style.transform]="getHourRotation()"></div>
-            <div class="minute-hand" [style.transform]="getMinuteRotation()"></div>
-            <div class="second-hand" [style.transform]="getSecondRotation()"></div>
-          </div>
-        </div>
-
-        <!-- Display Time in Text Format -->
-        <div class="time-text">
-          <p><b>Current Time:</b> {{ getFormattedTime() }}</p>
-        </div>
-
-        <p class="timezone"><b>Timezone:</b> {{ timezone }}</p>
+      <!-- Digital Time and Timezone -->
+      <div class="time-info">
+        <p class="time-text"><span>Current Time:</span> {{ getFormattedTime() }}</p>
+        <p class="timezone"><span>Timezone:</span> {{ timezone }}</p>
       </div>
+    </div>
+
+    <!-- No Selection State -->
+    <div *ngIf="!selectedCountryCode && !errorMessage" class="no-selection">
+      <mat-icon class="no-selection-icon">access_time</mat-icon>
+      <p>Please select a country to view its time.</p>
     </div>
   </div>
 </div>

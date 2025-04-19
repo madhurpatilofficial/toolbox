@@ -1,32 +1,24 @@
 <div class="calculator-container">
+  <!-- Title Card -->
   <div *ngIf="isLargeScreen" class="calculator-title">
     <div class="mat-card mat-elevation-z4">
       <div class="mat-card-content">Currency Calculator</div>
     </div>
   </div>
 
-  <div class="currency-converter">
-    <mat-form-field
-      appearance="fill"
-      class="custom-width"
-      [ngClass]="{ 'mobile-width': isMobile }"
-    >
+  <div class="currency-converter mat-elevation-z3">
+    <!-- From Currency -->
+    <mat-form-field appearance="fill" class="custom-width" [ngClass]="{ 'mobile-width': isMobile }">
       <mat-label>From Currency</mat-label>
       <mat-select [(value)]="fromCurrency" (selectionChange)="convert()">
-        <mat-option
-          *ngFor="let currency of conversionRates | keyvalue"
-          [value]="currency.key"
-        >
+        <mat-option *ngFor="let currency of conversionRates | keyvalue" [value]="currency.key">
           {{ currency.key }} - {{ getCountryName(currency.key) }}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field
-      appearance="fill"
-      class="custom-width"
-      [ngClass]="{ 'mobile-width': isMobile }"
-    >
+    <!-- Amount -->
+    <mat-form-field appearance="fill" class="custom-width" [ngClass]="{ 'mobile-width': isMobile }">
       <mat-label>Amount</mat-label>
       <input
         matInput
@@ -34,25 +26,51 @@
         [(ngModel)]="amount"
         (input)="validateAmount()"
         (ngModelChange)="convert()"
+        min="0"
       />
     </mat-form-field>
 
-    <mat-form-field
-      appearance="fill"
-      class="custom-width"
-      [ngClass]="{ 'mobile-width': isMobile }"
-    >
+    <!-- Swap Button -->
+    <div class="swap-container">
+      <button 
+        mat-mini-fab 
+        color="primary" 
+        class="swap-button"
+        (click)="swapCurrencies()"
+      >
+        <span class="material-icons">swap_vert</span>
+      </button>
+    </div>
+
+    <!-- To Currency -->
+    <mat-form-field appearance="fill" class="custom-width" [ngClass]="{ 'mobile-width': isMobile }">
       <mat-label>To Currency</mat-label>
       <mat-select [(value)]="toCurrency" (selectionChange)="convert()">
-        <mat-option
-          *ngFor="let currency of conversionRates | keyvalue"
-          [value]="currency.key"
-        >
+        <mat-option *ngFor="let currency of conversionRates | keyvalue" [value]="currency.key">
           {{ currency.key }} - {{ getCountryName(currency.key) }}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <p>Result: {{ result }}</p>
+    <!-- Result Display -->
+    <div class="result-container">
+      <div class="result-value">
+        {{ result | number:'1.2-2' }} {{ toCurrency }}
+      </div>
+      <div class="result-rate" *ngIf="amount > 0">
+        1 {{ fromCurrency }} = {{ (result / amount) | number:'1.4-4' }} {{ toCurrency }}
+      </div>
+    </div>
+
+    <!-- Convert Button -->
+    <button 
+      mat-raised-button 
+      color="primary" 
+      class="convert-button" 
+      (click)="convert()"
+    >
+      <span class="material-icons icon-space">autorenew</span>
+      Convert
+    </button>
   </div>
 </div>

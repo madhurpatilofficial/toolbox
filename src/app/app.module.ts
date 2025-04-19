@@ -24,6 +24,7 @@ import { CountriesComponent } from './components/countries/countries.component';
 import { FontsComponent } from './components/fonts/fonts.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import {MatChipsModule} from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { StringManipulatorComponent } from './components/data-manipulator/string-manipulator.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -81,6 +82,7 @@ import { MatDividerModule } from '@angular/material/divider';
     MatTooltipModule,
     MatAutocompleteModule,
     MatDividerModule,
+    MatChipsModule,
     NgxMatSelectSearchModule,
     AlertModule.forRoot(),
   ],

@@ -25,6 +25,14 @@ export class CurrencyconverterComponent implements OnInit {
   result: number = 0;
   isMobile: boolean | undefined;
   isLargeScreen: boolean = false;
+  today: Date = new Date();
+  swapCurrencies(): void {
+    const temp = this.fromCurrency;
+    this.fromCurrency = this.toCurrency;
+    this.toCurrency = temp;
+    this.convert();
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.checkScreenSize();
