@@ -1,12 +1,12 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { WeatherService } from '../../services/weather.service';
 import { LocationService } from '../../services/location.service';
-import { Color, ScaleType } from '@swimlane/ngx-charts'; // Import these
+import { Color, ScaleType } from '@swimlane/ngx-charts';
 
 @Component({
   selector: 'app-weather',
   templateUrl: './weather.component.html',
-  styleUrls: ['./weather.component.css'],
+  styleUrls: ['./weather.component.scss'],
 })
 export class WeatherComponent implements OnInit {
   countries: string[] = [];
@@ -16,31 +16,11 @@ export class WeatherComponent implements OnInit {
   weatherData: any = null;
   error: string = '';
   chartData: any[] = [];
+  isDarkMode: boolean = false;
+  weatherDetails: any[] = [];
 
-  // In your component.ts file, add this property for responsive chart sizing
-chartView: [number, number] = [600, 300];
+  chartView: [number, number] = [600, 300];
 
-// And add this to handle window resize
-@HostListener('window:resize', ['$event'])
-onResize(event: any) {
-  this.adjustChartSize();
-}
-
-
-private adjustChartSize() {
-  const width = window.innerWidth;
-  if (width < 600) {
-    this.chartView = [width - 40, 250];
-  } else if (width < 768) {
-    this.chartView = [width - 80, 250];
-  } else if (width < 992) {
-    this.chartView = [600, 300];
-  } else {
-    this.chartView = [700, 300];
-  }
-}
-  
-  // Fix for the color scheme
   colorScheme: Color = {
     name: 'weatherColors',
     selectable: true,
@@ -53,6 +33,39 @@ private adjustChartSize() {
   ngOnInit(): void {
     this.fetchCountries();
     this.adjustChartSize();
+    this.checkDarkModePreference();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.adjustChartSize();
+  }
+
+  private adjustChartSize() {
+    const width = window.innerWidth;
+    if (width < 600) {
+      this.chartView = [width - 40, 250];
+    } else if (width < 768) {
+      this.chartView = [width - 80, 250];
+    } else if (width < 992) {
+      this.chartView = [600, 300];
+    } else {
+      this.chartView = [700, 300];
+    }
+  }
+
+  private checkDarkModePreference() {
+    const darkModePref = localStorage.getItem('darkMode');
+    if (darkModePref !== null) {
+      this.isDarkMode = darkModePref === 'true';
+    } else {
+      this.isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+  }
+
+  toggleTheme(): void {
+    this.isDarkMode = !this.isDarkMode;
+    localStorage.setItem('darkMode', this.isDarkMode.toString());
   }
 
   fetchCountries(): void {
@@ -93,11 +106,49 @@ private adjustChartSize() {
       (data) => {
         this.weatherData = data;
         this.updateChart();
+        this.prepareWeatherDetails();
       },
       (err) => {
         this.error = `Failed to load weather data: ${err.message || 'Unknown error'}`;
       }
     );
+  }
+
+  prepareWeatherDetails(): void {
+    if (!this.weatherData) return;
+    
+    this.weatherDetails = [
+      {
+        label: 'Humidity',
+        value: `${this.weatherData.humidity}%`,
+        icon: 'opacity',
+        iconClass: 'humidity-icon'
+      },
+      {
+        label: 'Wind Speed',
+        value: `${this.weatherData.windSpeed} km/h`,
+        icon: 'air',
+        iconClass: 'wind-icon'
+      },
+      {
+        label: 'UV Index',
+        value: this.weatherData.uvIndex,
+        icon: 'wb_sunny',
+        iconClass: 'uv-icon'
+      },
+      {
+        label: 'Sunrise',
+        value: this.weatherData.sunrise,
+        icon: 'brightness_5',
+        iconClass: 'sunrise-icon'
+      },
+      {
+        label: 'Sunset',
+        value: this.weatherData.sunset,
+        icon: 'brightness_4',
+        iconClass: 'sunset-icon'
+      }
+    ];
   }
 
   updateChart(): void {
@@ -128,5 +179,21 @@ private adjustChartSize() {
     if (description.includes('sun') && description.includes('cloud')) return '⛅';
     if (description.includes('drizzle')) return '🌦️';
     return '🌍';
+  }
+
+  getWeatherIconClass(): string {
+    if (!this.weatherData || !this.weatherData.description) {
+      return 'unknown-weather';
+    }
+    
+    const description = this.weatherData.description.toLowerCase();
+    if (description.includes('clear')) return 'clear-weather';
+    if (description.includes('cloud')) return 'cloudy-weather';
+    if (description.includes('rain')) return 'rainy-weather';
+    if (description.includes('storm')) return 'stormy-weather';
+    if (description.includes('snow')) return 'snowy-weather';
+    if (description.includes('wind')) return 'windy-weather';
+    if (description.includes('fog') || description.includes('mist')) return 'foggy-weather';
+    return 'unknown-weather';
   }
 }
