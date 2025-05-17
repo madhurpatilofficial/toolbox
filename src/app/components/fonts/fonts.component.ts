@@ -47,6 +47,7 @@ export class FontsComponent implements OnInit, AfterViewInit {
   isDarkMode: boolean = false;
   isLargeScreen: boolean = false;
   currentCategory: string = 'all';
+  currentYear: number = new Date().getFullYear();
 
   // Categorized fonts
   fontCategories: FontCategoriesInterface = {
@@ -114,6 +115,18 @@ export class FontsComponent implements OnInit, AfterViewInit {
       }
     }, 500);
   }
+  getCategoryName(category: string): string {
+  const categoryNames: {[key: string]: string} = {
+    'all': 'All Fonts',
+    'recent': 'Recently Used',
+    'sans': 'Sans-Serif',
+    'serif': 'Serif',
+    'mono': 'Monospace',
+    'display': 'Display',
+    'special': 'Special'
+  };
+  return categoryNames[category] || category;
+}
 
   convertText() {
     this.convertedText = this.inputText;
