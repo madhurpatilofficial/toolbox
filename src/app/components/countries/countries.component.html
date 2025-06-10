@@ -38,13 +38,15 @@
             class="custom-select chart-type-select"
             *ngIf="selectedCountryCode"
           >
-            <mat-label>
-              <mat-icon>bar_chart</mat-icon> Chart Type
-            </mat-label>
-            <mat-select [(ngModel)]="chartType" (selectionChange)="renderChart()">
-              <mat-option value="bar">Bar Chart</mat-option>
-              <mat-option value="pie">Pie Chart</mat-option>
-            </mat-select>
+      <mat-label>
+  <mat-icon>bar_chart</mat-icon> Chart Type
+</mat-label>
+<mat-select [(ngModel)]="chartType" 
+           (selectionChange)="renderChart()" 
+           [ngClass]="{'wide-select': chartType === 'bar'}">
+  <mat-option value="bar" class="barc">Bar Chart</mat-option>
+  <mat-option value="pie">Pie Chart</mat-option>
+</mat-select>
           </mat-form-field>
         </div>
 
@@ -82,7 +84,7 @@
           class="chart-wrapper"
           [ngClass]="{ 'chart-active': selectedCountryCode && chartType }"
         >
-          <canvas id="chartCanvas"></canvas>
+          <canvas id="myChart"></canvas>
         </div>
       </section>
 
