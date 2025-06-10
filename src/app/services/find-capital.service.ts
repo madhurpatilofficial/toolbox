@@ -21,7 +21,7 @@ export class FindCapitalService {
     if (this.countryNamesCache.length > 0) {
       return of(this.countryNamesCache); // Return cached data if available
     } else {
-      const apiUrl = 'https://restcountries.com/v3.1/all';
+      const apiUrl = 'https://restcountries.com/v3.1/all?fields=name';
       return this.http.get<any[]>(apiUrl).pipe(
         tap(data => {
           this.countryNamesCache = data.map(country => country.name.common);
