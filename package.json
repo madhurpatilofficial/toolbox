@@ -20,10 +20,8 @@
     "@angular/platform-browser": "^17.3.6",
     "@angular/platform-browser-dynamic": "^17.3.6",
     "@angular/router": "^17.3.6",
-
-    "@mat-datetimepicker/core": "^17.0.1",
+    "@mat-datetimepicker/core": "^16.0.1",
     "@swimlane/ngx-charts": "^22.0.0-alpha.1",
-
     "angular-animations": "^0.11.0",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.2",
