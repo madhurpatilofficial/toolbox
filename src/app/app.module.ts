@@ -28,9 +28,7 @@ import {MatChipsModule} from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { StringManipulatorComponent } from './components/data-manipulator/string-manipulator.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { AlertModule } from 'ngx-bootstrap/alert';
 import { WeatherComponent } from './components/weather/weather.component';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinner, MatSpinner } from '@angular/material/progress-spinner';
@@ -75,13 +73,11 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
         MatButtonToggleModule,
         ReactiveFormsModule,
         MatToolbarModule,
-        NgxChartsModule,
         MatIconModule,
         MatMenuModule,
         MatTooltipModule,
         MatAutocompleteModule,
         MatDividerModule,
         MatChipsModule,
-        NgxMatSelectSearchModule,
-        AlertModule.forRoot()], providers: [WorldTimeService, provideHttpClient(withInterceptorsFromDi())] })
+        NgxMatSelectSearchModule], providers: [WorldTimeService, provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {}

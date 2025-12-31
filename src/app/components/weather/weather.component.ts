@@ -1,12 +1,12 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { WeatherService } from '../../services/weather.service';
 import { LocationService } from '../../services/location.service';
-import { Color, ScaleType } from '@swimlane/ngx-charts';
+import { Chart, ChartType, registerables } from 'chart.js';
 
 @Component({
     selector: 'app-weather',
     templateUrl: './weather.component.html',
-    styleUrls: ['./weather.component.scss'],
+    styleUrls: ['./weather.component.css'],
     standalone: false
 })
 export class WeatherComponent implements OnInit {
@@ -16,43 +16,25 @@ export class WeatherComponent implements OnInit {
   selectedCity: string = '';
   weatherData: any = null;
   error: string = '';
-  chartData: any[] = [];
   isDarkMode: boolean = false;
   weatherDetails: any[] = [];
 
-  chartView: [number, number] = [600, 300];
+  chart: any;
 
-  colorScheme: Color = {
-    name: 'weatherColors',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#2575fc', '#6a11cb', '#ff7e5f', '#30cfd0', '#ffc371']
-  };
+  @ViewChild('weatherChart') weatherChart!: ElementRef;
 
-  constructor(private weatherService: WeatherService, private locationService: LocationService) {}
+  constructor(private weatherService: WeatherService, private locationService: LocationService) {
+    Chart.register(...registerables);
+  }
 
   ngOnInit(): void {
     this.fetchCountries();
-    this.adjustChartSize();
     this.checkDarkModePreference();
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
-    this.adjustChartSize();
-  }
-
-  private adjustChartSize() {
-    const width = window.innerWidth;
-    if (width < 600) {
-      this.chartView = [width - 40, 250];
-    } else if (width < 768) {
-      this.chartView = [width - 80, 250];
-    } else if (width < 992) {
-      this.chartView = [600, 300];
-    } else {
-      this.chartView = [700, 300];
-    }
+    // Chart.js handles resize automatically
   }
 
   private checkDarkModePreference() {
@@ -153,14 +135,50 @@ export class WeatherComponent implements OnInit {
   }
 
   updateChart(): void {
-    if (this.weatherData) {
-      this.chartData = [
-        { name: 'Temperature (°C)', value: this.weatherData.temperature },
-        { name: 'Feels Like (°C)', value: this.weatherData.feelsLike },
-        { name: 'Humidity (%)', value: this.weatherData.humidity },
-        { name: 'Wind (km/h)', value: this.weatherData.windSpeed },
-        { name: 'UV Index', value: this.weatherData.uvIndex },
+    if (this.weatherData && this.weatherChart) {
+      // Destroy existing chart
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      const ctx = this.weatherChart.nativeElement.getContext('2d');
+      const data = [
+        this.weatherData.temperature,
+        this.weatherData.feelsLike,
+        this.weatherData.humidity,
+        this.weatherData.windSpeed,
+        this.weatherData.uvIndex,
       ];
+      const labels = ['Temperature (°C)', 'Feels Like (°C)', 'Humidity (%)', 'Wind (km/h)', 'UV Index'];
+
+      this.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Weather Metrics',
+            data: data,
+            backgroundColor: [
+              '#2575fc',
+              '#6a11cb',
+              '#ff7e5f',
+              '#30cfd0',
+              '#ffc371'
+            ],
+            borderColor: '#2c3e50',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
     }
   }
 

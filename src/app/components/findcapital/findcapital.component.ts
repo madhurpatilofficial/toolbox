@@ -9,7 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
     selector: 'app-findcapital',
     templateUrl: './findcapital.component.html',
-    styleUrls: ['./findcapital.component.scss'],
+    styleUrls: ['./findcapital.component.css'],
     animations: [
         trigger('fadeIn', [
             transition(':enter', [

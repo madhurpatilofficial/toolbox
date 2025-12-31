@@ -78,17 +78,7 @@
         <div class="chart-section">
           <h3>Weather Metrics</h3>
           <div class="chart-container">
-            <ngx-charts-bar-vertical
-              [results]="chartData"
-              [scheme]="colorScheme"
-              [gradient]="true"
-              [xAxis]="true"
-              [yAxis]="true"
-              [legend]="false"
-              [showDataLabel]="true"
-              [view]="chartView"
-              aria-label="Weather metrics chart">
-            </ngx-charts-bar-vertical>
+            <canvas #weatherChart></canvas>
           </div>
         </div>
       </div>
