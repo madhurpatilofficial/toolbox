@@ -6,7 +6,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { CalculatorComponent } from './components/calculator/calculator.component';
 import { FindcapitalComponent } from './components/findcapital/findcapital.component';
 import { HomeComponent } from './components/home/home.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CurrencyconverterComponent } from './components/currencyconverter/currencyconverter.component';
 import { ColorDisplayComponent } from './components/color-display/color-display.component';
 import { FindflagComponent } from './components/findflag/findflag.component';
@@ -42,53 +42,46 @@ import { MatDividerModule } from '@angular/material/divider';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    NavbarComponent,
-    CalculatorComponent,
-    FindcapitalComponent,
-    HomeComponent,
-    CurrencyconverterComponent,
-    ColorDisplayComponent,
-    FindflagComponent,
-    FooterComponent,
-    WorldClockComponent,
-    AgeCalculatorComponent,
-    FontsComponent,
-    CountriesComponent,
-    StringManipulatorComponent,
-    WeatherComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    MatInputModule,
-    MatCardModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatProgressSpinner,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatButtonToggleModule,
-    ReactiveFormsModule,
-    MatToolbarModule,
-    NgxChartsModule,
-    MatIconModule,
-    MatMenuModule,
-    MatTooltipModule,
-    MatAutocompleteModule,
-    MatDividerModule,
-    MatChipsModule,
-    NgxMatSelectSearchModule,
-    AlertModule.forRoot(),
-  ],
-  providers: [WorldTimeService],
-  bootstrap: [AppComponent],
-})
+@NgModule({ declarations: [
+        AppComponent,
+        NavbarComponent,
+        CalculatorComponent,
+        FindcapitalComponent,
+        HomeComponent,
+        CurrencyconverterComponent,
+        ColorDisplayComponent,
+        FindflagComponent,
+        FooterComponent,
+        WorldClockComponent,
+        AgeCalculatorComponent,
+        FontsComponent,
+        CountriesComponent,
+        StringManipulatorComponent,
+        WeatherComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        BrowserAnimationsModule,
+        MatInputModule,
+        MatCardModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatProgressSpinner,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatButtonToggleModule,
+        ReactiveFormsModule,
+        MatToolbarModule,
+        NgxChartsModule,
+        MatIconModule,
+        MatMenuModule,
+        MatTooltipModule,
+        MatAutocompleteModule,
+        MatDividerModule,
+        MatChipsModule,
+        NgxMatSelectSearchModule,
+        AlertModule.forRoot()], providers: [WorldTimeService, provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {}
