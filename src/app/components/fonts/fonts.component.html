@@ -17,10 +17,10 @@
           <h2 class="panel-title">Text Input</h2>
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Your text</mat-label>
-            <textarea 
+            <textarea
               #previewArea
-              matInput 
-              [(ngModel)]="inputText" 
+              matInput
+              [(ngModel)]="inputText"
               (input)="convertText()"
               cdkTextareaAutosize
               cdkAutosizeMinRows="3"
@@ -33,24 +33,27 @@
         <div class="panel-card">
           <h2 class="panel-title">Font Selection</h2>
           <div class="category-tabs">
-            <button mat-button 
-              *ngFor="let category of ['all', 'recent', 'sans', 'serif', 'mono', 'display', 'special']"
-              [class.active]="currentCategory === category"
-              (click)="filterByCategory(category)">
-              {{ getCategoryName(category) }}
-            </button>
+            @for (category of ['all', 'recent', 'sans', 'serif', 'mono', 'display', 'special']; track category) {
+              <button mat-button
+                [class.active]="currentCategory === category"
+                (click)="filterByCategory(category)">
+                {{ getCategoryName(category) }}
+              </button>
+            }
           </div>
-          
+
           <div class="font-select-container">
             <mat-form-field appearance="fill">
               <mat-label>Select font</mat-label>
               <mat-select [(ngModel)]="selectedFont" (selectionChange)="convertText()" panelClass="font-select-panel">
-                <mat-option *ngFor="let font of filteredFonts" [value]="font" [style.fontFamily]="font">
-                  <div class="font-option">
-                    <span class="font-sample" [style.fontFamily]="font">Aa</span>
-                    <span class="font-name">{{ font }}</span>
-                  </div>
-                </mat-option>
+                @for (font of filteredFonts; track font) {
+                  <mat-option [value]="font" [style.fontFamily]="font">
+                    <div class="font-option">
+                      <span class="font-sample" [style.fontFamily]="font">Aa</span>
+                      <span class="font-name">{{ font }}</span>
+                    </div>
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
           </div>
@@ -62,9 +65,11 @@
             <mat-form-field appearance="fill">
               <mat-label>Size</mat-label>
               <mat-select [(value)]="fontSize" (selectionChange)="setFontSize(fontSize)">
-                <mat-option *ngFor="let size of [10,12,14,16,18,20,24,28,32,36,40,48,56,64]" [value]="size">
-                  {{ size }}px
-                </mat-option>
+                @for (size of [10,12,14,16,18,20,24,28,32,36,40,48,56,64]; track size) {
+                  <mat-option [value]="size">
+                    {{ size }}px
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
 
@@ -106,43 +111,55 @@
             <div class="font-meta">
               <h2 class="preview-title">Preview</h2>
               <div class="font-tags">
-                <span class="font-tag" *ngIf="fontCategories.sans.includes(selectedFont)">Sans-Serif</span>
-                <span class="font-tag" *ngIf="fontCategories.serif.includes(selectedFont)">Serif</span>
-                <span class="font-tag" *ngIf="fontCategories.mono.includes(selectedFont)">Monospace</span>
-                <span class="font-tag" *ngIf="fontCategories.display.includes(selectedFont)">Display</span>
-                <span class="font-tag" *ngIf="fontCategories.special.includes(selectedFont)">Special</span>
+                @if (fontCategories.sans.includes(selectedFont)) {
+                  <span class="font-tag">Sans-Serif</span>
+                }
+                @if (fontCategories.serif.includes(selectedFont)) {
+                  <span class="font-tag">Serif</span>
+                }
+                @if (fontCategories.mono.includes(selectedFont)) {
+                  <span class="font-tag">Monospace</span>
+                }
+                @if (fontCategories.display.includes(selectedFont)) {
+                  <span class="font-tag">Display</span>
+                }
+                @if (fontCategories.special.includes(selectedFont)) {
+                  <span class="font-tag">Special</span>
+                }
               </div>
             </div>
-            
+
             <div class="font-info">
               <span class="font-name">{{ selectedFont }}</span>
               <span class="font-stats">{{ fontSize }}px • {{ fontWeight }} • {{ fontStyle }}</span>
-              <button mat-raised-button color="primary" class="action-button" 
-                  [disabled]="!convertedText" 
-                  [class.copied]="isCopied"
-                  (click)="copyConvertedText()">
-            <mat-icon>{{ isCopied ? 'check' : 'content_copy' }}</mat-icon>
-            <span>{{ isCopied ? 'Copied!' : 'Copy Style' }}</span>
-          </button>
+              <button mat-raised-button color="primary" class="action-button"
+                [disabled]="!convertedText"
+                [class.copied]="isCopied"
+                (click)="copyConvertedText()">
+                <mat-icon>{{ isCopied ? 'check' : 'content_copy' }}</mat-icon>
+                <span>{{ isCopied ? 'Copied!' : 'Copy Style' }}</span>
+              </button>
             </div>
-            
+
           </div>
 
           <div class="preview-content">
-            
-            <div class="preview-text" #previewText [ngClass]="{'placeholder': showPlaceholder}" 
-                 [style.font-family]="selectedFont"
-                 [style.font-size.px]="fontSize"
-                 [style.font-weight]="fontWeight"
-                 [style.font-style]="fontStyle"
-                 [style.color]="textColor">
-              <ng-container *ngIf="!showPlaceholder">{{ convertedText }}</ng-container>
-              <ng-container *ngIf="showPlaceholder">
+
+            <div class="preview-text" #previewText [ngClass]="{'placeholder': showPlaceholder}"
+              [style.font-family]="selectedFont"
+              [style.font-size.px]="fontSize"
+              [style.font-weight]="fontWeight"
+              [style.font-style]="fontStyle"
+              [style.color]="textColor">
+              @if (!showPlaceholder) {
+                {{ convertedText }}
+              }
+              @if (showPlaceholder) {
                 <p>The quick brown fox jumps over the lazy dog.</p>
                 <p>ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
                 <p>abcdefghijklmnopqrstuvwxyz</p>
                 <p>0123456789 !#$%^&*()</p>
-              </ng-container>
+              }
             </div>
           </div>
         </div>
@@ -150,33 +167,36 @@
     </div>
 
     <!-- Font Combinations Section -->
-    <section class="combinations-section" *ngIf="isLargeScreen">
-      <div class="section-header">
-        <h2>Font Pairings</h2>
-        <p class="section-description">Professionally curated font combinations for your projects</p>
-      </div>
-      
-      <div class="combinations-grid">
-        <div class="combination-card" *ngFor="let combo of fontCombinations" (click)="applyFontCombination(combo.heading, combo.body)">
-          <div class="combination-header">
-            <h3 [style.font-family]="combo.heading">{{ combo.name }}</h3>
-          </div>
-          <div class="combination-content">
-            <div class="combination-sample">
-              <p class="heading-sample" [style.font-family]="combo.heading">Heading Font</p>
-              <p class="font-name">{{ combo.heading }}</p>
-            </div>
-            <div class="combination-sample">
-              <p class="body-sample" [style.font-family]="combo.body">Body Font</p>
-              <p class="font-name">{{ combo.body }}</p>
-            </div>
-          </div>
-          <div class="combination-footer">
-            <button mat-button color="primary">Use this pairing</button>
-          </div>
+    @if (isLargeScreen) {
+      <section class="combinations-section">
+        <div class="section-header">
+          <h2>Font Pairings</h2>
+          <p class="section-description">Professionally curated font combinations for your projects</p>
         </div>
-      </div>
-    </section>
+        <div class="combinations-grid">
+          @for (combo of fontCombinations; track combo) {
+            <div class="combination-card" (click)="applyFontCombination(combo.heading, combo.body)">
+              <div class="combination-header">
+                <h3 [style.font-family]="combo.heading">{{ combo.name }}</h3>
+              </div>
+              <div class="combination-content">
+                <div class="combination-sample">
+                  <p class="heading-sample" [style.font-family]="combo.heading">Heading Font</p>
+                  <p class="font-name">{{ combo.heading }}</p>
+                </div>
+                <div class="combination-sample">
+                  <p class="body-sample" [style.font-family]="combo.body">Body Font</p>
+                  <p class="font-name">{{ combo.body }}</p>
+                </div>
+              </div>
+              <div class="combination-footer">
+                <button mat-button color="primary">Use this pairing</button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
   </main>
 
   <footer class="app-footer">

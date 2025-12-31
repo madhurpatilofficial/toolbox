@@ -4,27 +4,31 @@
       <div class="header-content">
         <h1 class="title">Weather Forecast</h1>
       </div>
-      
+
       <div class="location-selection">
         <div class="select-container">
           <mat-form-field appearance="outline" class="location-field">
             <mat-label>Country</mat-label>
             <mat-select [(ngModel)]="selectedCountry" (selectionChange)="onCountryChange()" aria-label="Select country">
               <mat-option [value]="" disabled>Select a country</mat-option>
-              <mat-option *ngFor="let country of countries" [value]="country">{{ country }}</mat-option>
+              @for (country of countries; track country) {
+                <mat-option [value]="country">{{ country }}</mat-option>
+              }
             </mat-select>
             <mat-icon matSuffix>public</mat-icon>
           </mat-form-field>
-          
+
           <mat-form-field appearance="outline" class="location-field">
             <mat-label>City</mat-label>
             <mat-select [(ngModel)]="selectedCity" [disabled]="!selectedCountry" aria-label="Select city">
               <mat-option [value]="" disabled>Select a city</mat-option>
-              <mat-option *ngFor="let city of cities" [value]="city">{{ city }}</mat-option>
+              @for (city of cities; track city) {
+                <mat-option [value]="city">{{ city }}</mat-option>
+              }
             </mat-select>
             <mat-icon matSuffix>location_city</mat-icon>
           </mat-form-field>
-          
+
           <button mat-raised-button color="primary" class="get-weather-btn" (click)="getWeather()" [disabled]="!selectedCity" aria-label="Get weather">
             <mat-icon>search</mat-icon> Get Weather
           </button>
@@ -32,68 +36,74 @@
       </div>
     </div>
 
-    <div *ngIf="error" class="error-message" role="alert">
-      <mat-icon>error_outline</mat-icon>
-      <div class="error-content">
-        <h3>Error Loading Data</h3>
-        <p>{{ error }}</p>
+    @if (error) {
+      <div class="error-message" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <div class="error-content">
+          <h3>Error Loading Data</h3>
+          <p>{{ error }}</p>
+        </div>
+        <button mat-icon-button class="close-error" (click)="error = ''" aria-label="Dismiss error">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
-      <button mat-icon-button class="close-error" (click)="error = ''" aria-label="Dismiss error">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
+    }
 
-    <div *ngIf="weatherData" class="weather-data">
-      <div class="current-weather">
-        <div class="weather-icon" [class]="getWeatherIconClass()" aria-hidden="true">
-          <span [innerHTML]="getWeatherIcon()"></span>
-        </div>
-        <div class="weather-main">
-          <h2>{{ selectedCity }}, {{ selectedCountry }}</h2>
-          <div class="temperature">{{ weatherData.temperature }}<span>°C</span></div>
-          <div class="description">{{ weatherData.description | titlecase }}</div>
-          <div class="feels-like">Feels like {{ weatherData.feelsLike }}°C</div>
-        </div>
-      </div>
-      
-      <div class="weather-details">
-        <div class="detail-item" *ngFor="let detail of weatherDetails" [attr.aria-label]="detail.label + ': ' + detail.value">
-          <div class="detail-icon" [class]="detail.iconClass">
-            <mat-icon>{{ detail.icon }}</mat-icon>
+    @if (weatherData) {
+      <div class="weather-data">
+        <div class="current-weather">
+          <div class="weather-icon" [class]="getWeatherIconClass()" aria-hidden="true">
+            <span [innerHTML]="getWeatherIcon()"></span>
           </div>
-          <div class="detail-info">
-            <div class="detail-label">{{ detail.label }}</div>
-            <div class="detail-value">{{ detail.value }}</div>
+          <div class="weather-main">
+            <h2>{{ selectedCity }}, {{ selectedCountry }}</h2>
+            <div class="temperature">{{ weatherData.temperature }}<span>°C</span></div>
+            <div class="description">{{ weatherData.description | titlecase }}</div>
+            <div class="feels-like">Feels like {{ weatherData.feelsLike }}°C</div>
           </div>
         </div>
-      </div>
-
-      <div class="chart-section">
-        <h3>Weather Metrics</h3>
-        <div class="chart-container">
-          <ngx-charts-bar-vertical
-            [results]="chartData"
-            [scheme]="colorScheme"
-            [gradient]="true"
-            [xAxis]="true"
-            [yAxis]="true"
-            [legend]="false"
-            [showDataLabel]="true"
-            [view]="chartView"
-            aria-label="Weather metrics chart">
-          </ngx-charts-bar-vertical>
+        <div class="weather-details">
+          @for (detail of weatherDetails; track detail) {
+            <div class="detail-item" [attr.aria-label]="detail.label + ': ' + detail.value">
+              <div class="detail-icon" [class]="detail.iconClass">
+                <mat-icon>{{ detail.icon }}</mat-icon>
+              </div>
+              <div class="detail-info">
+                <div class="detail-label">{{ detail.label }}</div>
+                <div class="detail-value">{{ detail.value }}</div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="chart-section">
+          <h3>Weather Metrics</h3>
+          <div class="chart-container">
+            <ngx-charts-bar-vertical
+              [results]="chartData"
+              [scheme]="colorScheme"
+              [gradient]="true"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="false"
+              [showDataLabel]="true"
+              [view]="chartView"
+              aria-label="Weather metrics chart">
+            </ngx-charts-bar-vertical>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <div *ngIf="!weatherData && !error" class="placeholder" aria-hidden="true">
-      <div class="placeholder-icon">
-        <mat-icon class="large-icon">cloud_queue</mat-icon>
+    }
+
+    @if (!weatherData && !error) {
+      <div class="placeholder" aria-hidden="true">
+        <div class="placeholder-icon">
+          <mat-icon class="large-icon">cloud_queue</mat-icon>
+        </div>
+        <div class="placeholder-text">
+          <h3>No Weather Data</h3>
+          <p>Select a location and click "Get Weather" to see the forecast</p>
+        </div>
       </div>
-      <div class="placeholder-text">
-        <h3>No Weather Data</h3>
-        <p>Select a location and click "Get Weather" to see the forecast</p>
-      </div>
-    </div>
+    }
   </div>
 </div>

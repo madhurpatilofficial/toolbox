@@ -11,76 +11,89 @@
           </mat-card-title>
           <mat-card-subtitle>Select a country to view and download its flag</mat-card-subtitle>
         </mat-card-header>
-        
+
         <mat-card-content>
           <!-- Country Selector -->
           <div class="search-input-container">
             <mat-form-field appearance="fill" class="search-field">
               <mat-label>Select a country</mat-label>
-              <mat-select 
-                [(value)]="selectedCountry" 
+              <mat-select
+                [(value)]="selectedCountry"
                 (selectionChange)="onCountrySelected()"
                 panelClass="custom-select-panel"
-              >
+                >
                 <mat-option value="" disabled>
                   <div class="select-placeholder">
                     <span>Search for a country</span>
                   </div>
                 </mat-option>
-                <mat-option *ngFor="let country of countries" [value]="country.value">
-                  <div class="country-option">
-                    <span class="country-name">{{ country.display }}</span>
-                  </div>
-                </mat-option>
+                @for (country of countries; track country) {
+                  <mat-option [value]="country.value">
+                    <div class="country-option">
+                      <span class="country-name">{{ country.display }}</span>
+                    </div>
+                  </mat-option>
+                }
               </mat-select>
-              <mat-icon matSuffix *ngIf="!isLoading">flag</mat-icon>
-              <mat-icon matSuffix *ngIf="isLoading">
-                <mat-spinner diameter="24" mode="indeterminate"></mat-spinner>
-              </mat-icon>
+              @if (!isLoading) {
+                <mat-icon matSuffix>flag</mat-icon>
+              }
+              @if (isLoading) {
+                <mat-icon matSuffix>
+                  <mat-spinner diameter="24" mode="indeterminate"></mat-spinner>
+                </mat-icon>
+              }
             </mat-form-field>
           </div>
 
           <!-- Flag Display Section -->
-          <div class="flag-display-section" *ngIf="flagUrl || isLoading">
-            <div class="flag-container" *ngIf="flagUrl && !isLoading">
-              <div class="flag-wrapper">
-                <img 
-                  [src]="flagUrl" 
-                  [alt]="'Flag of ' + selectedCountry" 
-                  class="flag-image"
-                  [class.shadow]="isLargeScreen"
-                />
+          @if (flagUrl || isLoading) {
+            <div class="flag-display-section">
+              @if (flagUrl && !isLoading) {
+                <div class="flag-container">
+                  <div class="flag-wrapper">
+                    <img
+                      [src]="flagUrl"
+                      [alt]="'Flag of ' + selectedCountry"
+                      class="flag-image"
+                      [class.shadow]="isLargeScreen"
+                      />
+                    </div>
+                    <div class="flag-actions">
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="downloadFlag()"
+                        class="download-button"
+                        >
+                        <mat-icon>download</mat-icon> Download Flag
+                      </button>
+                      <div class="flag-info">
+                        <mat-icon>info</mat-icon>
+                        <span>Flag of {{ selectedCountry }}</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+                @if (isLoading) {
+                  <div class="loading-container">
+                    <mat-spinner diameter="50"></mat-spinner>
+                    <p>Loading flag...</p>
+                  </div>
+                }
               </div>
-              <div class="flag-actions">
-                <button
-                  mat-raised-button
-                  color="primary"
-                  (click)="downloadFlag()"
-                  class="download-button"
-                >
-                  <mat-icon>download</mat-icon> Download Flag
-                </button>
-                <div class="flag-info">
-                  <mat-icon>info</mat-icon>
-                  <span>Flag of {{ selectedCountry }}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="loading-container" *ngIf="isLoading">
-              <mat-spinner diameter="50"></mat-spinner>
-              <p>Loading flag...</p>
-            </div>
-          </div>
+            }
 
-          <!-- Empty State -->
-          <div class="empty-state" *ngIf="!flagUrl && !isLoading">
-            <mat-icon class="empty-icon">flag</mat-icon>
-            <h3>No Flag Selected</h3>
-            <p>Please select a country from the dropdown to view its flag</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </main>
-</div>
+            <!-- Empty State -->
+            @if (!flagUrl && !isLoading) {
+              <div class="empty-state">
+                <mat-icon class="empty-icon">flag</mat-icon>
+                <h3>No Flag Selected</h3>
+                <p>Please select a country from the dropdown to view its flag</p>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </main>
+  </div>

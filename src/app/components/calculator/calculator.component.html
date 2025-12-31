@@ -1,7 +1,7 @@
 <div class="calculator-wrapper">
   <div class="calculator-container" [ngClass]="{'small-screen': isSmallScreen}">
 
-    
+
     <div class="calculator-body">
       <div class="display-container">
         <div class="input-display">
@@ -13,30 +13,35 @@
       </div>
 
       <div class="buttons-container">
-        <button 
-          *ngFor="let button of calculatorButtons" 
-          (click)="handleButtonClick(button.value, button.type)"
+        @for (button of calculatorButtons; track button) {
+          <button
+            (click)="handleButtonClick(button.value, button.type)"
           [ngClass]="[
             'calculator-button',
             'button-' + button.type,
             button.value === '=' ? 'button-equals' : ''
           ]"
-        >
-          {{ button.label }}
-        </button>
+            >
+            {{ button.label }}
+          </button>
+        }
       </div>
     </div>
 
-    <div *ngIf="isLargeScreen && history.length > 0" class="history-container">
-      <div class="history-header">
-        <h3>History</h3>
-        <button class="clear-history-btn" (click)="clearHistory()">Clear</button>
-      </div>
-      <div class="history-list">
-        <div *ngFor="let item of history.slice(0, 5)" class="history-item">
-          {{ item }}
+    @if (isLargeScreen && history.length > 0) {
+      <div class="history-container">
+        <div class="history-header">
+          <h3>History</h3>
+          <button class="clear-history-btn" (click)="clearHistory()">Clear</button>
+        </div>
+        <div class="history-list">
+          @for (item of history.slice(0, 5); track item) {
+            <div class="history-item">
+              {{ item }}
+            </div>
+          }
         </div>
       </div>
-    </div>
+    }
   </div>
 </div>
