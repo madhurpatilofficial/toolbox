@@ -1,35 +1,34 @@
-// navbar.component.ts
-
 import { Component, HostListener, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+    selector: 'app-navbar',
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.css'],
+    standalone: false
 })
 export class NavbarComponent implements OnInit {
-  isMenuVisible = false;
-  menuIconActive = false;
+  isMenuOpen = false;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
-    console.log("Initial isMenuVisible:", this.isMenuVisible);
     this.checkScreenSize();
   }
 
-  toggleMenu() {
-    this.isMenuVisible = !this.isMenuVisible;
-    this.menuIconActive = this.isMenuVisible;
-    console.log("Toggled isMenuVisible:", this.isMenuVisible);
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen = false;
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
+  onResize(event: Event): void {
     this.checkScreenSize();
   }
 
-  private checkScreenSize() {
-    this.isMenuVisible = window.innerWidth <= 600;
+  private checkScreenSize(): void {
+    this.isMenuOpen = window.innerWidth > 768 && this.isMenuOpen;
   }
 }

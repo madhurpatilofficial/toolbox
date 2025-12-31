@@ -1,56 +1,153 @@
-// world-clock.component.ts
-
-import { Component } from '@angular/core';
-import { WorldTimeService } from '../../services/world-service.service';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { countries } from '../../constants/countries';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { WorldTimeService } from '../../services/world-service.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-world-clock',
-  templateUrl: './world-clock.component.html',
-  styleUrls: ['./world-clock.component.css']
+    selector: 'app-world-clock',
+    templateUrl: './world-clock.component.html',
+    styleUrls: ['./world-clock.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush // Optimize change detection
+    ,
+    standalone: false
 })
-export class WorldClockComponent {
+export class WorldClockComponent implements OnInit, OnDestroy {
   countries = countries;
   selectedCountryCode: string = '';
-  currentTime: any;
-  hourMarkers: number[] = Array.from({ length: 12 }, (_, i) => i + 1);
-  minuteMarkers: number[] = Array.from({ length: 60 }, (_, i) => i + 1);
+  errorMessage: string = '';
 
-  constructor(private worldTimeService: WorldTimeService) { }
+  hours: number = 0;
+  minutes: number = 0;
+  seconds: number = 0;
+  timezone: string = '';
+
+  isLargeScreen: boolean = false;
+
+  private countryChangeSubject = new Subject<string>();
+  private intervalId: any; // Store the interval ID
+
+  constructor(
+    private worldTimeService: WorldTimeService,
+    private breakpointObserver: BreakpointObserver,
+    private cdr: ChangeDetectorRef // Inject ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    this.breakpointObserver.observe([Breakpoints.Large, Breakpoints.XLarge])
+      .subscribe(result => {
+        this.isLargeScreen = result.matches;
+      });
+
+    this.countryChangeSubject.pipe(
+      debounceTime(300), // Debounce user input
+      distinctUntilChanged() // Only emit if the value has changed
+    ).subscribe(countryCode => {
+      this.fetchTime(countryCode);
+    });
+  }
+
+  ngOnDestroy() {
+    // Clear the interval when the component is destroyed
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+  }
 
   onCountryChange() {
-    this.worldTimeService.getTimeByCountry(this.selectedCountryCode)
-      .subscribe((data: any) => {
-        this.currentTime = data;
-        // Parse the datetime string to get year, time, and timezone separately
-        const dateTimeParts = data.datetime.split('T');
-        this.currentTime.year = dateTimeParts[0];
-        let timeParts = dateTimeParts[1].split('.')[0].split(':'); // Extract time without milliseconds and split into parts
-        const hours = parseInt(timeParts[0]);
-        const minutes = parseInt(timeParts[1]);
-        const seconds = parseInt(timeParts[2]);
-        this.currentTime.time = this.formatTime(hours, minutes, seconds);
+    if (!this.selectedCountryCode) {
+      console.warn('No country selected');
+      return;
+    }
+
+    this.countryChangeSubject.next(this.selectedCountryCode);
+  }
+
+  fetchTime(countryCode: string) {
+    this.worldTimeService.getTimeByCountry(countryCode)
+      .subscribe({
+        next: (data: any) => {
+          if (data.datetime) {
+            this.errorMessage = '';
+            this.processTime(data.datetime);
+            this.timezone = data.timezone;
+            this.cdr.markForCheck(); // Manually trigger change detection
+          } else {
+            this.errorMessage = 'Unexpected response from API';
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching time:', error);
+          this.errorMessage = 'Failed to fetch time. Please try again later.';
+          this.cdr.markForCheck(); // Manually trigger change detection
+        }
       });
   }
 
-  formatTime(hours: number, minutes: number, seconds: number): string {
-    const ampm = hours >= 12 ? 'PM' : 'AM'; // Determine if it's AM or PM
-    const formattedHours = hours % 12 || 12; // Handle midnight (0 hours)
-    return `${formattedHours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds} ${ampm}`;
+  processTime(datetime: string) {
+    const dateTimeParts = datetime.split('T');
+    let timeParts = dateTimeParts[1].split(':');
+
+    this.hours = parseInt(timeParts[0]);
+    this.minutes = parseInt(timeParts[1]);
+    this.seconds = parseInt(timeParts[2]);
+
+    this.startClock();
   }
 
-  getHourRotation(time: string): string {
-    const hours = parseInt(time.split(':')[0]);
-    return ((hours % 12) * 30).toString(); // 30 degrees for each hour on the clock
+  startClock() {
+    // Clear the existing interval if it exists
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+
+    // Start a new interval
+    this.intervalId = setInterval(() => {
+      this.seconds++;
+      if (this.seconds === 60) {
+        this.seconds = 0;
+        this.minutes++;
+      }
+      if (this.minutes === 60) {
+        this.minutes = 0;
+        this.hours++;
+      }
+      if (this.hours === 24) {
+        this.hours = 0;
+      }
+      this.cdr.markForCheck(); // Manually trigger change detection
+    }, 1000);
   }
 
-  getMinuteRotation(time: string): string {
-    const minutes = parseInt(time.split(':')[1]);
-    return (minutes * 6).toString(); // 6 degrees for each minute on the clock
+  getHourRotation(): string {
+    return `rotate(${(this.hours % 12) * 30 + this.minutes * 0.5}deg)`;
   }
 
-  getSecondRotation(time: string): string {
-    const seconds = parseInt(time.split(':')[2]);
-    return (seconds * 6).toString(); // 6 degrees for each second on the clock
+  getMinuteRotation(): string {
+    return `rotate(${this.minutes * 6}deg)`;
   }
+
+  getSecondRotation(): string {
+    return `rotate(${this.seconds * 6}deg)`;
+  }
+
+  // Format time as HH:MM:SS AM/PM
+  getFormattedTime(): string {
+    const pad = (num: number) => num < 10 ? `0${num}` : num;
+    const hours12 = this.hours % 12 || 12; // Convert to 12-hour format (0 becomes 12)
+    const ampm = this.hours < 12 ? 'AM' : 'PM'; // Determine AM/PM
+    return `${pad(hours12)}:${pad(this.minutes)}:${pad(this.seconds)} ${ampm}`;
+  }
+  
+  getCurrentDate(): string {
+    const now = new Date();
+    return now.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+
 }

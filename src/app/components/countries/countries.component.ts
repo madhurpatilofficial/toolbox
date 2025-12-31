@@ -1,20 +1,34 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Chart, PluginOptionsByType, registerables } from 'chart.js';
-import 'chartjs-plugin-gradient';
+import { Chart, ChartType, registerables } from 'chart.js';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { debounceTime, Subject } from 'rxjs';
 import { CountryServiceService } from '../../services/country-service.service';
 
-interface CustomPluginOptions extends PluginOptionsByType<'bar'> {
-  gradient?: {
-    start: string;
-    end: string;
-    color: string[];
-  };
-}
-
 @Component({
-  selector: 'app-root',
-  templateUrl: './countries.component.html',
-  styleUrls: ['./countries.component.css']
+    selector: 'app-root',
+    templateUrl: './countries.component.html',
+    styleUrls: ['./countries.component.css'],
+    animations: [
+        trigger('fadeIn', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateY(10px)' }),
+                animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+            ]),
+        ]),
+        trigger('cardAnimation', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateX(-20px)' }),
+                animate('300ms ease-out', style({ opacity: 1, transform: 'translateX(0)' })),
+            ]),
+        ]),
+        trigger('modalAnimation', [
+            state('open', style({ opacity: 1, visibility: 'visible' })),
+            state('closed', style({ opacity: 0, visibility: 'hidden' })),
+            transition('closed => open', animate('300ms ease-out')),
+            transition('open => closed', animate('300ms ease-in')),
+        ]),
+    ],
+    standalone: false
 })
 export class CountriesComponent implements OnInit {
   countries: any[] = [];
@@ -23,177 +37,250 @@ export class CountriesComponent implements OnInit {
   countryPopulation: number | undefined;
   errorMessage: string | undefined;
   chartType: string = 'bar';
+  modalChartType: string = 'bar';
   chart: any;
   top5HighPopulation: any[] = [];
   top5LowPopulation: any[] = [];
   additionalInfo: any = {};
   isPopulationGraphModalOpen: boolean = false;
-  isHiddenInfoVisible: boolean = false;
+  isLoading: boolean = false;
+  isGraphButtonBlinking: boolean = true;
 
   @ViewChild('populationChart') populationChart!: ElementRef;
 
+  private countrySelectionSubject = new Subject<string>();
+
   constructor(private countryService: CountryServiceService) {
     Chart.register(...registerables);
+    this.countrySelectionSubject.pipe(debounceTime(300)).subscribe(() => {
+      this.fetchCountryPopulation();
+    });
   }
 
   ngOnInit() {
-    this.countryService.getAllCountries()
-      .subscribe(countries => {
+    this.isLoading = true;
+    this.countryService.getAllCountries().subscribe(
+      (countries) => {
         this.countries = countries;
         this.findTop5HighPopulation();
         this.findTop5LowPopulation();
-      }, error => {
-        console.error('Error fetching countries:', error);
-        this.errorMessage = 'Error fetching countries. Please try again.';
-      });
-    this.fetchCountryPopulation();
-    this.renderPopulationChart();
-  }
-
-  renderPopulationChart(): void {
-    this.countryService.getAllCountries()
-      .subscribe(countries => {
-        const labels = countries.map(country => country.name.common);
-        const populations = countries.map(country => country.population);
-
-        const ctx = this.populationChart.nativeElement.getContext('2d');
-        if (ctx) {
-          new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Population',
-                data: populations,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-              }]
-            },
-            options: {
-              scales: {
-                y: {
-                  beginAtZero: true
-                }
-              }
-            }
-          });
-        }
-      });
-  }
-
-  fetchCountryPopulation() {
-    // Fetch population data for the selected country
-    this.countryService.getCountryPopulation(this.selectedCountryCode)
-      .subscribe(population => {
-        console.log('Population:', population);
-        this.countryPopulation = population;
-        this.selectedCountryName = this.countries.find(country => country.cca2 === this.selectedCountryCode)?.name.common;
-        this.errorMessage = undefined;
-        this.renderChart();
-        this.showBorder();
-        this.toggleBlinking();
-        this.additionalInfo = this.countries.find(country => country.cca2 === this.selectedCountryCode);
-      }, error => {
-        console.error('Error fetching population:', error);
-        this.errorMessage = 'Error fetching population. Please try again.';
-        this.countryPopulation = undefined;
-      });
-  }
-
-  isBlinking: boolean = false; // Added isBlinking property
-  toggleBlinking() {
-    this.isBlinking = true;
-  }
-
-  showBorder() {
-    const chartSection = document.querySelector('.chart-section');
-    if (chartSection) {
-      chartSection.classList.add('show-border');
-    }
-  }
-
-  renderChart() {
-    const ctx = document.getElementById('myChart') as HTMLCanvasElement;
-    if (ctx) {
-      if (this.chart) {
-        this.chart.destroy();
-      }
-
-      if (this.chartType === 'bar') {
-        this.renderBarChart(ctx);
-      } else if (this.chartType === 'pie') {
-        this.renderPieChart(ctx);
-      }
-    }
-  }
-
-  renderBarChart(ctx: HTMLCanvasElement) {
-    const gradient = ctx.getContext('2d')!.createLinearGradient(0, 0, 0, 400);
-
-    gradient.addColorStop(0, '#ff7fff');
-    gradient.addColorStop(1, '#4bc0c0');
-
-    this.chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: [this.selectedCountryName],
-        datasets: [{
-          label: 'Population',
-          data: [this.countryPopulation],
-          backgroundColor: gradient,
-          borderColor: 'rgba(76, 193, 193, 1)',
-          borderWidth: 3
-        }]
+        this.isLoading = false;
       },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
+      (error) => {
+        this.errorMessage = 'Error fetching countries. Please try again.';
+        this.isLoading = false;
+      }
+    );
+  }
+
+  colors: string[] = [
+    '#3498db',
+    '#2ecc71',
+    '#e74c3c',
+    '#f1c40f',
+    '#9b59b6',
+    '#1abc9c',
+    '#e67e22',
+    '#34495e',
+    '#ff6b6b',
+    '#00cec9',
+  ];
+
+  onCountrySelectionChange() {
+    this.countrySelectionSubject.next(this.selectedCountryCode);
+  }
+
+  // Add this to track if the chart should be visible
+showChart: boolean = false;
+
+// Modify your fetchCountryPopulation method
+fetchCountryPopulation() {
+  if (!this.selectedCountryCode) return;
+  
+  this.showChart = false; // Hide chart while loading
+  this.isLoading = true;
+  
+  // Find the selected country from the already loaded countries array
+  const selectedCountry = this.countries.find(
+    (country) => country.cca2 === this.selectedCountryCode
+  );
+  
+  if (selectedCountry) {
+    this.countryPopulation = selectedCountry.population;
+    this.selectedCountryName = selectedCountry.name.common;
+    this.errorMessage = undefined;
+    this.additionalInfo = selectedCountry;
+    
+    console.log('Selected Country:', selectedCountry);
+    console.log('Population:', this.countryPopulation);
+    
+    // Render chart after a small delay to ensure DOM is ready
+    setTimeout(() => {
+      this.renderChart();
+      this.showChart = true;
+    }, 100);
+    
+    this.isLoading = false;
+  } else {
+    this.errorMessage = 'Country not found. Please try again.';
+    this.countryPopulation = undefined;
+    this.showChart = false;
+    this.isLoading = false;
+  }
+}
+renderChart() {
+  // Ensure we have required data
+  if (!this.selectedCountryName || this.countryPopulation === undefined) {
+    console.log('Missing data for chart:', { 
+      selectedCountryName: this.selectedCountryName, 
+      countryPopulation: this.countryPopulation 
+    });
+    return;
+  }
+
+  // Get canvas element
+  const canvas = document.getElementById('myChart') as HTMLCanvasElement;
+  if (!canvas) {
+    console.error('Canvas element not found');
+    return;
+  }
+
+  // Clear previous chart if exists
+  if (this.chart) {
+    this.chart.destroy();
+    this.chart = null;
+  }
+
+  // Get context
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    console.error('Could not get canvas context');
+    return;
+  }
+
+  // Create gradient for bar chart
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, '#3498db');
+  gradient.addColorStop(1, '#2ecc71');
+
+  // Prepare data based on chart type
+  const chartData = {
+    labels: [this.selectedCountryName],
+    datasets: [{
+      label: 'Population',
+      data: [this.countryPopulation],
+      backgroundColor: this.chartType === 'pie' || this.chartType === 'doughnut' 
+        ? ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6'] 
+        : gradient,
+      borderColor: this.chartType === 'pie' || this.chartType === 'doughnut'
+        ? '#ffffff'
+        : '#2c3e50',
+      borderWidth: this.chartType === 'pie' || this.chartType === 'doughnut' ? 2 : 1,
+      hoverBackgroundColor: this.chartType === 'pie' || this.chartType === 'doughnut'
+        ? ['#2980b9', '#27ae60', '#c0392b', '#f39c12', '#8e44ad']
+        : undefined
+    }]
+  };
+
+  // Chart options based on type
+  let chartOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      duration: 800,
+      easing: 'easeOutQuart',
+    },
+    plugins: {
+      legend: {
+        display: this.chartType === 'pie' || this.chartType === 'doughnut',
+        position: 'top' as const,
+        labels: {
+          color: '#2c3e50',
+          font: { size: 12 }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const value = context.raw;
+            return `${context.label}: ${value.toLocaleString()}`;
           }
         }
       }
-    });
+    }
+  };
+
+  // Add scales for bar and line charts
+  if (this.chartType === 'bar' || this.chartType === 'line') {
+    chartOptions.scales = {
+      y: {
+        beginAtZero: true,
+        grid: { 
+          color: '#ecf0f1',
+          display: true 
+        },
+        ticks: { 
+          color: '#2c3e50', 
+          font: { size: 11 },
+          callback: function(value: any) {
+            return value.toLocaleString();
+          }
+        },
+        title: {
+          display: true,
+          text: 'Population',
+          color: '#2c3e50',
+          font: { size: 12 }
+        }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { 
+          color: '#2c3e50', 
+          font: { size: 11 } 
+        },
+        title: {
+          display: true,
+          text: 'Country',
+          color: '#2c3e50',
+          font: { size: 12 }
+        }
+      }
+    };
   }
 
-  renderPieChart(ctx: HTMLCanvasElement) {
+  // Create chart
+  try {
     this.chart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: [this.selectedCountryName],
-        datasets: [{
-          label: 'Population',
-          data: [this.countryPopulation],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)'
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)'
-          ],
-          borderWidth: 2
-        }]
-      }
+      type: this.chartType as ChartType,
+      data: chartData,
+      options: chartOptions
     });
+    console.log('Chart created successfully:', this.chart);
+  } catch (error) {
+    console.error('Error creating chart:', error);
   }
+}
+
+// Also add this method to handle chart type changes
+onChartTypeChange() {
+  if (this.countryPopulation !== undefined && this.selectedCountryName) {
+    setTimeout(() => {
+      this.renderChart();
+    }, 100);
+  }
+}
 
   findTop5HighPopulation() {
     this.top5HighPopulation = this.countries
-      .filter(country => country.population !== undefined)
+      .filter((country) => country.population !== undefined)
       .sort((a, b) => b.population - a.population)
       .slice(0, 5);
   }
 
   findTop5LowPopulation() {
     this.top5LowPopulation = this.countries
-      .filter(country => country.population !== undefined)
+      .filter((country) => country.population !== undefined)
       .sort((a, b) => a.population - b.population)
       .slice(0, 5);
   }
@@ -202,7 +289,9 @@ export class CountriesComponent implements OnInit {
     if (this.additionalInfo && this.additionalInfo[field]) {
       if (field === 'currencies') {
         const currencies = this.additionalInfo[field];
-        const currencyNames = Object.values(currencies).map((currency: any) => currency.name);
+        const currencyNames = Object.values(currencies).map(
+          (currency: any) => currency.name
+        );
         return currencyNames.join(', ');
       } else if (field === 'flags' || field === 'coatOfArms') {
         return this.additionalInfo[field]?.png;
@@ -211,20 +300,92 @@ export class CountriesComponent implements OnInit {
       } else {
         return this.additionalInfo[field];
       }
-    } else {
-      return 'N/A';
     }
+    return 'N/A';
   }
 
   openPopulationGraphModal() {
     this.isPopulationGraphModalOpen = true;
+    setTimeout(() => this.renderPopulationChart(), 0);
   }
 
   closePopulationGraphModal() {
     this.isPopulationGraphModalOpen = false;
   }
 
-  toggleHiddenInfo() {
-    this.isHiddenInfoVisible = !this.isHiddenInfoVisible;
+  renderPopulationChart(): void {
+    this.isLoading = true;
+    this.countryService.getAllCountries().subscribe((countries) => {
+      const labels = countries.map((country) => country.name.common);
+      const populations = countries.map((country) => country.population);
+
+      const ctx = this.populationChart.nativeElement.getContext('2d');
+      if (ctx) {
+        if (this.chart) {
+          this.chart.destroy();
+        }
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, '#3498db');
+        gradient.addColorStop(1, '#2ecc71');
+
+        this.chart = new Chart(ctx, {
+          type: this.modalChartType as ChartType,
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Population',
+                data: populations,
+                backgroundColor:
+                  this.modalChartType === 'bar' || this.modalChartType === 'line'
+                    ? gradient
+                    : this.colors,
+                borderColor: '#2c3e50',
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 800,
+              easing: 'easeOutQuart',
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: '#ecf0f1' },
+                ticks: { color: '#2c3e50', font: { size: 11 } },
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: '#2c3e50', font: { size: 11 } },
+              },
+            },
+            plugins: {
+              legend: {
+                display: true,
+                labels: {
+                  color: '#2c3e50',
+                  font: { size: 11 },
+                  filter: (legendItem: any, data: any) => {
+                    if (
+                      this.modalChartType === 'polarArea' ||
+                      this.modalChartType === 'doughnut'
+                    ) {
+                      return false;
+                    }
+                    return true;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+      this.isLoading = false;
+    });
   }
 }

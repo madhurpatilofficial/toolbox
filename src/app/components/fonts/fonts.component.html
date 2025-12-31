@@ -1,19 +1,212 @@
-<div class="container">
-    <h1>Font Converter</h1>
-    <div>
-      <div>
-        <textarea [(ngModel)]="inputText" placeholder="Type your text here" class="textarea" (input)="convertText()"></textarea>
-      </div>
-      <select [(ngModel)]="selectedFont" class="select">
-        <option *ngFor="let font of fonts" [value]="font">{{ font }}</option>
-      </select>
-    </div>
-  </div>
-  <div class="container" *ngIf="selectedFont">
-    <div class="converted-text" [style.font-family]="selectedFont">
-      {{ convertedText }}
-      <div class="converted-text-buttons">
-        <button (click)="copyConvertedText()">Copy</button>
+<div class="font-explorer-app" [class.dark-mode]="isDarkMode">
+  <header class="app-header">
+    <div class="header-container">
+      <div class="header-content">
+        <h1 class="app-title">Font Explorer</h1>
+        <p class="app-subtitle">Discover, preview, and compare fonts for your projects</p>
       </div>
     </div>
-  </div>
+  </header>
+
+  <main class="app-main">
+
+    <div class="content-grid">
+      <!-- Font Controls Panel -->
+      <section class="controls-panel">
+        <div class="panel-card">
+          <h2 class="panel-title">Text Input</h2>
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Your text</mat-label>
+            <textarea
+              #previewArea
+              matInput
+              [(ngModel)]="inputText"
+              (input)="convertText()"
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="3"
+              cdkAutosizeMaxRows="5"
+              placeholder="Type or paste text here..."
+            ></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="panel-card">
+          <h2 class="panel-title">Font Selection</h2>
+          <div class="category-tabs">
+            @for (category of ['all', 'recent', 'sans', 'serif', 'mono', 'display', 'special']; track category) {
+              <button mat-button
+                [class.active]="currentCategory === category"
+                (click)="filterByCategory(category)">
+                {{ getCategoryName(category) }}
+              </button>
+            }
+          </div>
+
+          <div class="font-select-container">
+            <mat-form-field appearance="fill">
+              <mat-label>Select font</mat-label>
+              <mat-select [(ngModel)]="selectedFont" (selectionChange)="convertText()" panelClass="font-select-panel">
+                @for (font of filteredFonts; track font) {
+                  <mat-option [value]="font" [style.fontFamily]="font">
+                    <div class="font-option">
+                      <span class="font-sample" [style.fontFamily]="font">Aa</span>
+                      <span class="font-name">{{ font }}</span>
+                    </div>
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h2 class="panel-title">Text Styling</h2>
+          <div class="style-controls-grid">
+            <mat-form-field appearance="fill">
+              <mat-label>Size</mat-label>
+              <mat-select [(value)]="fontSize" (selectionChange)="setFontSize(fontSize)">
+                @for (size of [10,12,14,16,18,20,24,28,32,36,40,48,56,64]; track size) {
+                  <mat-option [value]="size">
+                    {{ size }}px
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Weight</mat-label>
+              <mat-select [(value)]="fontWeight" (selectionChange)="setFontWeight(fontWeight)">
+                <mat-option value="100">Thin (100)</mat-option>
+                <mat-option value="300">Light (300)</mat-option>
+                <mat-option value="400">Regular (400)</mat-option>
+                <mat-option value="500">Medium (500)</mat-option>
+                <mat-option value="700">Bold (700)</mat-option>
+                <mat-option value="900">Black (900)</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Style</mat-label>
+              <mat-select [(value)]="fontStyle" (selectionChange)="setFontStyle(fontStyle)">
+                <mat-option value="normal">Normal</mat-option>
+                <mat-option value="italic">Italic</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="color-picker-container">
+              <label>Text Color</label>
+              <div class="color-picker-wrapper">
+                <input type="color" [(ngModel)]="textColor" (change)="setTextColor(textColor)">
+                <span class="color-value">{{ textColor }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Preview Panel -->
+      <section class="preview-panel">
+        <div class="preview-container">
+          <div class="preview-header">
+            <div class="font-meta">
+              <h2 class="preview-title">Preview</h2>
+              <div class="font-tags">
+                @if (fontCategories.sans.includes(selectedFont)) {
+                  <span class="font-tag">Sans-Serif</span>
+                }
+                @if (fontCategories.serif.includes(selectedFont)) {
+                  <span class="font-tag">Serif</span>
+                }
+                @if (fontCategories.mono.includes(selectedFont)) {
+                  <span class="font-tag">Monospace</span>
+                }
+                @if (fontCategories.display.includes(selectedFont)) {
+                  <span class="font-tag">Display</span>
+                }
+                @if (fontCategories.special.includes(selectedFont)) {
+                  <span class="font-tag">Special</span>
+                }
+              </div>
+            </div>
+
+            <div class="font-info">
+              <span class="font-name">{{ selectedFont }}</span>
+              <span class="font-stats">{{ fontSize }}px • {{ fontWeight }} • {{ fontStyle }}</span>
+              <button mat-raised-button color="primary" class="action-button"
+                [disabled]="!convertedText"
+                [class.copied]="isCopied"
+                (click)="copyConvertedText()">
+                <mat-icon>{{ isCopied ? 'check' : 'content_copy' }}</mat-icon>
+                <span>{{ isCopied ? 'Copied!' : 'Copy Style' }}</span>
+              </button>
+            </div>
+
+          </div>
+
+          <div class="preview-content">
+
+            <div class="preview-text" #previewText [ngClass]="{'placeholder': showPlaceholder}"
+              [style.font-family]="selectedFont"
+              [style.font-size.px]="fontSize"
+              [style.font-weight]="fontWeight"
+              [style.font-style]="fontStyle"
+              [style.color]="textColor">
+              @if (!showPlaceholder) {
+                {{ convertedText }}
+              }
+              @if (showPlaceholder) {
+                <p>The quick brown fox jumps over the lazy dog.</p>
+                <p>ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+                <p>abcdefghijklmnopqrstuvwxyz</p>
+                <p>0123456789 !#$%^&*()</p>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Font Combinations Section -->
+    @if (isLargeScreen) {
+      <section class="combinations-section">
+        <div class="section-header">
+          <h2>Font Pairings</h2>
+          <p class="section-description">Professionally curated font combinations for your projects</p>
+        </div>
+        <div class="combinations-grid">
+          @for (combo of fontCombinations; track combo) {
+            <div class="combination-card" (click)="applyFontCombination(combo.heading, combo.body)">
+              <div class="combination-header">
+                <h3 [style.font-family]="combo.heading">{{ combo.name }}</h3>
+              </div>
+              <div class="combination-content">
+                <div class="combination-sample">
+                  <p class="heading-sample" [style.font-family]="combo.heading">Heading Font</p>
+                  <p class="font-name">{{ combo.heading }}</p>
+                </div>
+                <div class="combination-sample">
+                  <p class="body-sample" [style.font-family]="combo.body">Body Font</p>
+                  <p class="font-name">{{ combo.body }}</p>
+                </div>
+              </div>
+              <div class="combination-footer">
+                <button mat-button color="primary">Use this pairing</button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p>Font Explorer © {{ currentYear }} - All system fonts preview</p>
+      <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Feedback</a>
+        <a href="#">Help</a>
+      </div>
+    </div>
+  </footer>
+</div>

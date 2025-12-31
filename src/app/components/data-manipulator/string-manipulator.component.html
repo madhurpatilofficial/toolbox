@@ -1,0 +1,209 @@
+<div class="container">
+  <!-- Toolbar -->
+  <mat-toolbar color="primary" class="toolbar">
+    <span>Data Manipulator</span>
+  </mat-toolbar>
+
+  <!-- Main Card -->
+  <mat-card class="main-card">
+    <mat-card-content>
+      <!-- Input Section -->
+      <div class="input-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Enter Data</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="inputString"
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="3"
+            cdkAutosizeMaxRows="10"
+            placeholder="Type or paste your text here..."
+          ></textarea>
+        </mat-form-field>
+        <div class="input-actions">
+          <button mat-raised-button color="accent" (click)="clear()">Clear</button>
+          <button mat-raised-button color="primary" (click)="readTextAloud()">
+            Read Aloud
+          </button>
+          <button mat-raised-button color="warn" (click)="stopTextAloud()">
+            Stop
+          </button>
+          <mat-form-field appearance="outline" class="voice-select">
+            <mat-label>Select Voice</mat-label>
+            <mat-select [(ngModel)]="selectedVoice">
+              @for (voice of voices; track voice) {
+                <mat-option [value]="voice">
+                  {{ voice.name }} ({{ voice.lang }})@if (voice.default) {
+                  <span> — Default</span>
+                }
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Operations Section -->
+    <mat-tab-group mat-align-tabs="start" class="operations-tabs">
+      <!-- Basic Transformations -->
+      <mat-tab label="Basic">
+        <div class="button-grid">
+          <button mat-raised-button class="basic-btn" (click)="toUpperCase()">To Upper Case</button>
+          <button mat-raised-button class="basic-btn" (click)="toLowerCase()">To Lower Case</button>
+          <button mat-raised-button class="basic-btn" (click)="capitalizeWords()">Capitalize Words</button>
+          <button mat-raised-button class="basic-btn" (click)="toTitleCase()">To Title Case</button>
+          <button mat-raised-button class="basic-btn" (click)="toggleCase()">Toggle Case</button>
+          <button mat-raised-button class="basic-btn" (click)="toCamelCase()">To Camel Case</button>
+          <button mat-raised-button class="basic-btn" (click)="toKebabCase()">To Kebab Case</button>
+          <button mat-raised-button class="basic-btn" (click)="toSnakeCase()">To Snake Case</button>
+          <button mat-raised-button class="basic-btn" (click)="toPascalCase()">To Pascal Case</button>
+        </div>
+      </mat-tab>
+
+      <!-- String Modifications -->
+      <mat-tab label="Modify">
+        <div class="button-grid">
+          <button mat-raised-button class="modify-btn" (click)="reverseString()">Reverse String</button>
+          <button mat-raised-button class="modify-btn" (click)="reverseWords()">Reverse Words</button>
+          <button mat-raised-button class="modify-btn" (click)="reverseEachWord()">Reverse Each Word</button>
+          <button mat-raised-button class="modify-btn" (click)="removeSpaces()">Remove Spaces</button>
+          <button mat-raised-button class="modify-btn" (click)="removePunctuation()">Remove Punctuation</button>
+          <button mat-raised-button class="modify-btn" (click)="removeDuplicates()">Remove Duplicates</button>
+          <button mat-raised-button class="modify-btn" (click)="removeNonAlphanumeric()">Remove Non-Alphanumeric</button>
+          <button mat-raised-button class="modify-btn" (click)="sortCharacters()">Sort Characters</button>
+          <button mat-raised-button class="modify-btn" (click)="scrambleString()">Scramble String</button>
+          <button mat-raised-button class="modify-btn" (click)="truncateString(10)">Truncate String</button>
+          <button mat-raised-button class="modify-btn" (click)="showReplaceInputs = true">Replace Substring</button>
+          <button mat-raised-button class="modify-btn" (click)="showInsertInputs = true">Insert Substring</button>
+        </div>
+      </mat-tab>
+
+      <!-- Encoding/Decoding -->
+      <mat-tab label="Encode/Decode">
+        <div class="button-grid">
+          <button mat-raised-button class="encode-btn" (click)="encodeBase64()">Encode Base64</button>
+          <button mat-raised-button class="encode-btn" (click)="decodeBase64()">Decode Base64</button>
+          <button mat-raised-button class="encode-btn" (click)="toHexadecimal()">To Hexadecimal</button>
+          <button mat-raised-button class="encode-btn" (click)="fromHexadecimal()">From Hexadecimal</button>
+          <button mat-raised-button class="encode-btn" (click)="toBinary()">To Binary</button>
+          <button mat-raised-button class="encode-btn" (click)="fromBinary()">From Binary</button>
+          <button mat-raised-button class="encode-btn" (click)="toAscii()">To ASCII</button>
+          <button mat-raised-button class="encode-btn" (click)="fromAscii()">From ASCII</button>
+          <button mat-raised-button class="encode-btn" (click)="toMorseCode()">To Morse Code</button>
+          <button mat-raised-button class="encode-btn" (click)="fromMorseCode()">From Morse Code</button>
+          <button mat-raised-button class="encode-btn" (click)="urlEncode()">URL Encode</button>
+          <button mat-raised-button class="encode-btn" (click)="urlDecode()">URL Decode</button>
+          <button mat-raised-button class="encode-btn" (click)="htmlEncode()">HTML Encode</button>
+          <button mat-raised-button class="encode-btn" (click)="htmlDecode()">HTML Decode</button>
+          <button mat-raised-button class="encode-btn" (click)="rot13Encrypt()">ROT13 Encrypt</button>
+          <button mat-raised-button class="encode-btn" (click)="rot13Decrypt()">ROT13 Decrypt</button>
+          <button mat-raised-button class="encode-btn" (click)="toRot47()">To ROT47</button>
+          <button mat-raised-button class="encode-btn" (click)="fromRot47()">From ROT47</button>
+        </div>
+      </mat-tab>
+
+      <!-- Analysis -->
+      <mat-tab label="Analyze">
+        <div class="button-grid">
+          <button mat-raised-button class="analyze-btn" (click)="countWords()">Count Words</button>
+          <button mat-raised-button class="analyze-btn" (click)="countCharactersExcludingSpaces()">Count Characters (Excl. Spaces)</button>
+          <button mat-raised-button class="analyze-btn" (click)="countDigits()">Count Digits</button>
+          <button mat-raised-button class="analyze-btn" (click)="countVowels()">Count Vowels</button>
+          <button mat-raised-button class="analyze-btn" (click)="countConsonants()">Count Consonants</button>
+          <button mat-raised-button class="analyze-btn" (click)="countUppercase()">Count Uppercase</button>
+          <button mat-raised-button class="analyze-btn" (click)="countLowercase()">Count Lowercase</button>
+          <button mat-raised-button class="analyze-btn" (click)="countUniqueCharacters()">Count Unique Characters</button>
+          <button mat-raised-button class="analyze-btn" (click)="countSentences()">Count Sentences</button>
+          <button mat-raised-button class="analyze-btn" (click)="checkPalindrome()">Check Palindrome</button>
+          <button mat-raised-button class="analyze-btn" (click)="checkIsogram()">Check Isogram</button>
+          <button mat-raised-button class="analyze-btn" (click)="checkAnagram()">Check Anagram</button>
+          <button mat-raised-button class="analyze-btn" (click)="levenshteinDistance()">Levenshtein Distance</button>
+          <button mat-raised-button class="analyze-btn" (click)="jaroWinklerSimilarity()">Jaro-Winkler Similarity</button>
+          <button mat-raised-button class="analyze-btn" (click)="sumOfDigits()">Sum of Digits</button>
+          <button mat-raised-button class="analyze-btn" (click)="findLongestWord()">Find Longest Word</button>
+          <button mat-raised-button class="analyze-btn" (click)="findShortestWord()">Find Shortest Word</button>
+          <button mat-raised-button class="analyze-btn" (click)="findMostFrequentWord()">Most Frequent Word</button>
+          <button mat-raised-button class="analyze-btn" (click)="findFirstNonRepeatedChar()">First Non-Repeated Char</button>
+          <button mat-raised-button class="analyze-btn" (click)="findLongestPalindromeSubstring()">Longest Palindrome</button>
+          <button mat-raised-button class="analyze-btn" (click)="countSpecificCharacter('a')">Count Specific Character</button>
+          <button mat-raised-button class="analyze-btn" (click)="countSpecificWord('the')">Count Specific Word</button>
+        </div>
+      </mat-tab>
+
+      <!-- Miscellaneous -->
+      <mat-tab label="Misc">
+        <div class="button-grid">
+          <button mat-raised-button class="misc-btn" (click)="generateAcronym()">Generate Acronym</button>
+          <button mat-raised-button class="misc-btn" (click)="toPigLatin()">To Pig Latin</button>
+          <button mat-raised-button class="misc-btn" (click)="shuffleWords()">Shuffle Words</button>
+          <button mat-raised-button class="misc-btn" (click)="extractUniqueWords()">Extract Unique Words</button>
+          <button mat-raised-button class="misc-btn" (click)="removeHtmlTags()">Remove HTML Tags</button>
+          <button mat-raised-button class="misc-btn" (click)="convertNewlinesToBr()">Newlines to <br></button>
+          <button mat-raised-button class="misc-btn" (click)="generateRandomString(10)">Generate Random String</button>
+          <button mat-raised-button class="misc-btn" (click)="findAllSubstrings(3)">Find All Substrings</button>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <!-- Replace Substring Inputs -->
+    @if (showReplaceInputs) {
+      <div class="action-inputs">
+        <mat-form-field appearance="outline">
+          <mat-label>Replace</mat-label>
+          <input matInput [(ngModel)]="replaceFrom" placeholder="Text to replace" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>With</mat-label>
+          <input matInput [(ngModel)]="replaceTo" placeholder="Replacement text" />
+        </mat-form-field>
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" (click)="replaceSubstring()">Replace</button>
+          <button mat-button color="warn" (click)="resetInputs()">Cancel</button>
+        </div>
+      </div>
+    }
+
+    <!-- Insert Substring Inputs -->
+    @if (showInsertInputs) {
+      <div class="action-inputs">
+        <mat-form-field appearance="outline">
+          <mat-label>Insert Text</mat-label>
+          <input matInput [(ngModel)]="insertContent" placeholder="Text to insert" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Position</mat-label>
+          <input
+            type="number"
+            matInput
+            [(ngModel)]="insertPosition"
+            min="0"
+            [max]="inputString.length"
+            placeholder="Insert position"
+            />
+          </mat-form-field>
+          <div class="action-buttons">
+            <button mat-raised-button color="primary" (click)="insertSubString()">Insert</button>
+            <button mat-button color="warn" (click)="resetInputs()">Cancel</button>
+          </div>
+        </div>
+      }
+
+      <!-- Result Section -->
+      @if (resultString) {
+        <div class="result-section">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Result</mat-label>
+            <textarea
+              matInput
+              [value]="resultString"
+              readonly
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="2"
+              cdkAutosizeMaxRows="10"
+            ></textarea>
+          </mat-form-field>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

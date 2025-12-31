@@ -1,0 +1,239 @@
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f5f7fa;
+  font-family: 'Roboto', sans-serif;
+}
+:host {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+.toolbar {
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0 16px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.main-card {
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  background-color: white;
+  transition: transform 0.3s ease;
+}
+
+.main-card:hover {
+  transform: translateY(-2px);
+}
+
+.input-section {
+  margin-bottom: 32px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.voice-select {
+  width: 100%;
+  margin: 16px 0 8px; /* Adjusted margin to position it after Enter Data and before buttons */
+}
+
+.input-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px; /* Reduced margin to align with voice select */
+  flex-wrap: wrap;
+}
+
+.search-section {
+  margin-bottom: 24px;
+}
+
+.search-bar {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.operations-tabs {
+  margin-top: 16px;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 24px 0;
+  align-items: stretch;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.button-grid button {
+  height: 48px;
+  line-height: 48px;
+  font-size: 14px;
+  text-align: center;
+  border-radius: 8px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  padding: 0 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button-grid button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.button-grid button:disabled {
+  background-color: #e0e0e0;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.basic-btn {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+.basic-btn:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.modify-btn {
+  background-color: #2196F3; /* Blue */
+  color: white;
+}
+
+.modify-btn:hover:not(:disabled) {
+  background-color: #1e88e5;
+}
+
+.encode-btn {
+  background-color: #9C27B0; /* Purple */
+  color: white;
+}
+
+.encode-btn:hover:not(:disabled) {
+  background-color: #8e24aa;
+}
+
+.analyze-btn {
+  background-color: #FF9800; /* Orange */
+  color: white;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  background-color: #fb8c00;
+}
+
+.misc-btn {
+  background-color: #607D8B; /* Gray-blue */
+  color: white;
+}
+
+.misc-btn:hover:not(:disabled) {
+  background-color: #546e7a;
+}
+
+.action-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 24px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.action-inputs mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.result-section {
+  margin-top: 32px;
+}
+
+.result-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in;
+}
+
+.result-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.no-results {
+  padding: 16px;
+  color: #666;
+  text-align: center;
+  font-style: italic;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@media (max-width: 768px) {
+  .input-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .voice-select {
+    max-width: 100%;
+  }
+
+  .button-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .button-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-inputs {
+    flex-direction: column;
+  }
+
+  .container {
+    padding: 16px;
+  }
+
+  .main-card {
+    padding: 16px;
+  }
+
+  .input-actions {
+    gap: 8px;
+  }
+}

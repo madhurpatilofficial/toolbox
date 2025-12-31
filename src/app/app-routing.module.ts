@@ -10,6 +10,8 @@ import { WorldClockComponent } from './components/world-clock/world-clock.compon
 import { AgeCalculatorComponent } from './components/age-calculator/age-calculator.component';
 import { CountriesComponent } from './components/countries/countries.component';
 import { FontsComponent } from './components/fonts/fonts.component';
+import { StringManipulatorComponent } from './components/data-manipulator/string-manipulator.component';
+import { WeatherComponent } from './components/weather/weather.component';
 
 const routes: Routes = [
   {
@@ -45,12 +47,20 @@ const routes: Routes = [
     component: WorldClockComponent
   },
   {
-    path: 'population',
-    component: CountriesComponent
+    path: 'population', loadChildren: () => import('./countries.module').then(m => m.CountriesModule)
+
   },
   {
     path: 'fontconverter',
     component: FontsComponent
+  },
+  {
+    path: 'data-manipulation',
+    component: StringManipulatorComponent
+  },
+  {
+    path: 'weather-service',
+    component: WeatherComponent
   }
 ];
 

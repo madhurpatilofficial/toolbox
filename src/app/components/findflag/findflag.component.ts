@@ -1,12 +1,15 @@
-// findflag.component.ts
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { saveAs } from 'file-saver';
-
+import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
-  selector: 'app-findflag',
-  templateUrl: './findflag.component.html',
-  styleUrls: ['./findflag.component.css']
+    selector: 'app-findflag',
+    templateUrl: './findflag.component.html',
+    styleUrls: ['./findflag.component.css'],
+    standalone: false
 })
 export class FindflagComponent implements OnInit {
   selectedCountry: string = '';
@@ -206,37 +209,111 @@ export class FindflagComponent implements OnInit {
 
   ];
 
-  flagUrl: string = '';
 
-  constructor(private http: HttpClient) { }
+  flagUrl: string = '';
+  isLoading: boolean = false;
+  isLargeScreen: boolean = false;
+  themeMode: 'light' | 'dark' = 'light';
+  currentYear: number = new Date().getFullYear();
+  
+  private searchTerm$ = new Subject<string>();
+
+  constructor(
+    private http: HttpClient, 
+    private breakpointObserver: BreakpointObserver,
+    private snackBar: MatSnackBar
+  ) { }
 
   ngOnInit(): void {
+    // Check system preference for dark mode
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.themeMode = prefersDark ? 'dark' : 'light';
+    this.applyTheme();
+
+    // Setup search pipeline
+    this.setupSearchPipeline();
+
+    // Responsive breakpoint observer
+    this.breakpointObserver.observe([
+      Breakpoints.Large, 
+      Breakpoints.XLarge
+    ]).subscribe(result => {
+      this.isLargeScreen = result.matches;
+    });
   }
 
-  loadFlag(): void {
-    if (this.selectedCountry) {
-      const apiUrl = `https://restcountries.com/v3.1/name/${encodeURIComponent(this.selectedCountry)}`;
-      this.http.get<any[]>(apiUrl).subscribe(
-        (data) => {
-          if (Array.isArray(data) && data.length > 0 && data[0].flags) {
-            this.flagUrl = data[0].flags.png;
-          } else {
-            this.flagUrl = '';
-          }
-        },
-        (error) => {
-          console.error('Error fetching country data', error);
-          this.flagUrl = '';
-        }
-      );
+  private setupSearchPipeline(): void {
+    this.searchTerm$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (!term) return of('');
+        this.isLoading = true;
+        return this.fetchFlagUrl(term).pipe(
+          catchError(error => {
+            this.handleError(error);
+            return of('');
+          })
+        );
+      })
+    ).subscribe(flagUrl => {
+      this.flagUrl = flagUrl;
+      this.isLoading = false;
+      
+      if (flagUrl && this.selectedCountry) {
+        this.snackBar.open(`Flag loaded for ${this.selectedCountry}`, 'Close', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+      }
+    });
+  }
+
+  private applyTheme(): void {
+    if (this.themeMode === 'dark') {
+      document.body.classList.add('dark-theme');
     } else {
-      this.flagUrl = '';
+      document.body.classList.remove('dark-theme');
     }
+  }
+
+  onCountrySelected(): void {
+    this.searchTerm$.next(this.selectedCountry);
+  }
+
+  private fetchFlagUrl(countryName: string): Observable<string> {
+    const apiUrl = `https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}`;
+    return this.http.get<any[]>(apiUrl).pipe(
+      map(data => {
+        if (Array.isArray(data) && data.length > 0 && data[0].flags) {
+          return data[0].flags.png || data[0].flags.svg || '';
+        }
+        return '';
+      })
+    );
+  }
+
+  private handleError(error: any): void {
+    this.isLoading = false;
+    this.snackBar.open('Error loading flag. Please try again.', 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
+    console.error('API Error:', error);
   }
 
   downloadFlag(): void {
     if (this.flagUrl) {
-      saveAs(this.flagUrl, 'country_flag.png');
+      saveAs(this.flagUrl, `${this.selectedCountry.replace(/\s+/g, '_')}_flag.png`);
+      this.snackBar.open('Download started!', 'Close', {
+        duration: 3000,
+        panelClass: ['success-snackbar']
+      });
     }
+  }
+
+  toggleTheme(): void {
+    this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
+    this.applyTheme();
   }
 }
