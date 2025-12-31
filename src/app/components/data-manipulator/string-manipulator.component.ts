@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-string-manipulator',
-  templateUrl: './string-manipulator.component.html',
-  styleUrls: ['./string-manipulator.component.css'],
+    selector: 'app-string-manipulator',
+    templateUrl: './string-manipulator.component.html',
+    styleUrls: ['./string-manipulator.component.css'],
+    standalone: false
 })
 export class StringManipulatorComponent implements OnInit {
   inputString: string = '';

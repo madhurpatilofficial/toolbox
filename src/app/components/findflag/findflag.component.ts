@@ -6,9 +6,10 @@ import { Observable, of, Subject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
-  selector: 'app-findflag',
-  templateUrl: './findflag.component.html',
-  styleUrls: ['./findflag.component.css']
+    selector: 'app-findflag',
+    templateUrl: './findflag.component.html',
+    styleUrls: ['./findflag.component.css'],
+    standalone: false
 })
 export class FindflagComponent implements OnInit {
   selectedCountry: string = '';

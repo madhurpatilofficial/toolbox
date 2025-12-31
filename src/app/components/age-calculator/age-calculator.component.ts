@@ -3,9 +3,10 @@ import { Component, OnDestroy } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 
 @Component({
-  selector: 'app-age-calculator',
-  templateUrl: './age-calculator.component.html',
-  styleUrls: ['./age-calculator.component.css']
+    selector: 'app-age-calculator',
+    templateUrl: './age-calculator.component.html',
+    styleUrls: ['./age-calculator.component.css'],
+    standalone: false
 })
 export class AgeCalculatorComponent implements OnDestroy {
   age: any = {};

@@ -13,9 +13,10 @@ interface CountryNames {
 }
 
 @Component({
-  selector: 'app-currencyconverter',
-  templateUrl: './currencyconverter.component.html',
-  styleUrls: ['./currencyconverter.component.css'],
+    selector: 'app-currencyconverter',
+    templateUrl: './currencyconverter.component.html',
+    styleUrls: ['./currencyconverter.component.css'],
+    standalone: false
 })
 export class CurrencyconverterComponent implements OnInit {
   conversionRates: CurrencyRate[] = []; // Updated type to CurrencyRate

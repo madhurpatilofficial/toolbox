@@ -4,9 +4,10 @@ import { LocationService } from '../../services/location.service';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 
 @Component({
-  selector: 'app-weather',
-  templateUrl: './weather.component.html',
-  styleUrls: ['./weather.component.scss'],
+    selector: 'app-weather',
+    templateUrl: './weather.component.html',
+    styleUrls: ['./weather.component.scss'],
+    standalone: false
 })
 export class WeatherComponent implements OnInit {
   countries: string[] = [];

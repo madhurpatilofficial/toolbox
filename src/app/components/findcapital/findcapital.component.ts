@@ -7,39 +7,40 @@ import { trigger, transition, style, animate, state, query, stagger } from '@ang
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-findcapital',
-  templateUrl: './findcapital.component.html',
-  styleUrls: ['./findcapital.component.scss'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(20px)' }),
-        animate('600ms cubic-bezier(0.35, 0, 0.25, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
-      ])
-    ]),
-    trigger('staggerIn', [
-      transition('* => *', [
-        query(':enter', [
-          style({ opacity: 0, transform: 'translateY(10px)' }),
-          stagger('100ms', [
-            animate('500ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-          ])
-        ], { optional: true })
-      ])
-    ]),
-    trigger('pulse', [
-      state('active', style({ transform: 'scale(1.05)' })),
-      state('inactive', style({ transform: 'scale(1)' })),
-      transition('inactive => active', animate('300ms ease-in')),
-      transition('active => inactive', animate('300ms ease-out'))
-    ]),
-    trigger('rotate', [
-      state('active', style({ transform: 'rotate(360deg)' })),
-      state('inactive', style({ transform: 'rotate(0deg)' })),
-      transition('inactive => active', animate('1000ms linear')),
-      transition('active => inactive', animate('0ms'))
-    ])
-  ]
+    selector: 'app-findcapital',
+    templateUrl: './findcapital.component.html',
+    styleUrls: ['./findcapital.component.scss'],
+    animations: [
+        trigger('fadeIn', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateY(20px)' }),
+                animate('600ms cubic-bezier(0.35, 0, 0.25, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+            ])
+        ]),
+        trigger('staggerIn', [
+            transition('* => *', [
+                query(':enter', [
+                    style({ opacity: 0, transform: 'translateY(10px)' }),
+                    stagger('100ms', [
+                        animate('500ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+                    ])
+                ], { optional: true })
+            ])
+        ]),
+        trigger('pulse', [
+            state('active', style({ transform: 'scale(1.05)' })),
+            state('inactive', style({ transform: 'scale(1)' })),
+            transition('inactive => active', animate('300ms ease-in')),
+            transition('active => inactive', animate('300ms ease-out'))
+        ]),
+        trigger('rotate', [
+            state('active', style({ transform: 'rotate(360deg)' })),
+            state('inactive', style({ transform: 'rotate(0deg)' })),
+            transition('inactive => active', animate('1000ms linear')),
+            transition('active => inactive', animate('0ms'))
+        ])
+    ],
+    standalone: false
 })
 export class FindcapitalComponent implements OnInit {
   selectedCountry: string = '';

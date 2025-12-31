@@ -5,29 +5,30 @@ import { debounceTime, Subject } from 'rxjs';
 import { CountryServiceService } from '../../services/country-service.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './countries.component.html',
-  styleUrls: ['./countries.component.css'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(10px)' }),
-        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
-      ]),
-    ]),
-    trigger('cardAnimation', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-20px)' }),
-        animate('300ms ease-out', style({ opacity: 1, transform: 'translateX(0)' })),
-      ]),
-    ]),
-    trigger('modalAnimation', [
-      state('open', style({ opacity: 1, visibility: 'visible' })),
-      state('closed', style({ opacity: 0, visibility: 'hidden' })),
-      transition('closed => open', animate('300ms ease-out')),
-      transition('open => closed', animate('300ms ease-in')),
-    ]),
-  ],
+    selector: 'app-root',
+    templateUrl: './countries.component.html',
+    styleUrls: ['./countries.component.css'],
+    animations: [
+        trigger('fadeIn', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateY(10px)' }),
+                animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+            ]),
+        ]),
+        trigger('cardAnimation', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateX(-20px)' }),
+                animate('300ms ease-out', style({ opacity: 1, transform: 'translateX(0)' })),
+            ]),
+        ]),
+        trigger('modalAnimation', [
+            state('open', style({ opacity: 1, visibility: 'visible' })),
+            state('closed', style({ opacity: 0, visibility: 'hidden' })),
+            transition('closed => open', animate('300ms ease-out')),
+            transition('open => closed', animate('300ms ease-in')),
+        ]),
+    ],
+    standalone: false
 })
 export class CountriesComponent implements OnInit {
   countries: any[] = [];

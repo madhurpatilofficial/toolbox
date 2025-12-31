@@ -1,9 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 
 @Component({
-  selector: 'app-color-display',
-  templateUrl: './color-display.component.html',
-  styleUrls: ['./color-display.component.css']
+    selector: 'app-color-display',
+    templateUrl: './color-display.component.html',
+    styleUrls: ['./color-display.component.css'],
+    standalone: false
 })
 export class ColorDisplayComponent {
   selectedColor: string | null = null;

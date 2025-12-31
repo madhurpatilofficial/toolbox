@@ -6,10 +6,12 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-world-clock',
-  templateUrl: './world-clock.component.html',
-  styleUrls: ['./world-clock.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush // Optimize change detection
+    selector: 'app-world-clock',
+    templateUrl: './world-clock.component.html',
+    styleUrls: ['./world-clock.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush // Optimize change detection
+    ,
+    standalone: false
 })
 export class WorldClockComponent implements OnInit, OnDestroy {
   countries = countries;

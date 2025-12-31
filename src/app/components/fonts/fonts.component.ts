@@ -13,23 +13,24 @@ interface FontCategoriesInterface {
 }
 
 @Component({
-  selector: 'app-fonts',
-  templateUrl: './fonts.component.html',
-  styleUrls: ['./fonts.component.css'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('300ms ease-in', style({ opacity: 1 })),
-      ]),
-    ]),
-    trigger('slideIn', [
-      transition(':enter', [
-        style({ transform: 'translateY(20px)', opacity: 0 }),
-        animate('400ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
-      ]),
-    ]),
-  ]
+    selector: 'app-fonts',
+    templateUrl: './fonts.component.html',
+    styleUrls: ['./fonts.component.css'],
+    animations: [
+        trigger('fadeIn', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('300ms ease-in', style({ opacity: 1 })),
+            ]),
+        ]),
+        trigger('slideIn', [
+            transition(':enter', [
+                style({ transform: 'translateY(20px)', opacity: 0 }),
+                animate('400ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
+            ]),
+        ]),
+    ],
+    standalone: false
 })
 export class FontsComponent implements OnInit, AfterViewInit {
   @ViewChild('previewArea') previewArea!: ElementRef;
