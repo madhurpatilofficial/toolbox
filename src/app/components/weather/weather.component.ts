@@ -18,7 +18,6 @@ export class WeatherComponent implements OnInit {
   chartData: any[] = [];
   isDarkMode: boolean = false;
   weatherDetails: any[] = [];
-  locationLabel: string = '';
 
   chartView: [number, number] = [600, 300];
 
@@ -37,8 +36,8 @@ export class WeatherComponent implements OnInit {
     this.checkDarkModePreference();
   }
 
-  @HostListener('window:resize')
-  onResize() {
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
     this.adjustChartSize();
   }
 
@@ -84,10 +83,9 @@ export class WeatherComponent implements OnInit {
     this.cities = [];
     this.selectedCity = '';
     this.weatherData = null;
-    this.locationLabel = '';
-
+    
     if (!this.selectedCountry) return;
-
+    
     this.locationService.getCities(this.selectedCountry).subscribe(
       (data) => {
         this.cities = data.data.sort();
@@ -100,15 +98,13 @@ export class WeatherComponent implements OnInit {
 
   getWeather(): void {
     if (!this.selectedCity) return;
-
+    
     this.error = '';
     this.weatherData = null;
-
+    
     this.weatherService.getWeather(this.selectedCity).subscribe(
       (data) => {
         this.weatherData = data;
-        // store a human-friendly location label (City, Country) if available from selection
-        this.locationLabel = `${this.selectedCity}${this.selectedCountry ? ', ' + this.selectedCountry : ''}`;
         this.updateChart();
         this.prepareWeatherDetails();
       },
@@ -118,48 +114,13 @@ export class WeatherComponent implements OnInit {
     );
   }
 
-  /**
-   * Convert ISO datetime (local timezone ISO string from Open-Meteo) to a friendly time string.
-   * Example input: "2025-11-22T06:44:00+05:30" or "2025-11-22T06:44"
-   */
-  private formatTime(isoOrNull: string | null): string {
-    if (!isoOrNull) return 'N/A';
-    try {
-      // Create Date object - many Open-Meteo daily sunrise/sunset values are ISO strings with timezone
-      const d = new Date(isoOrNull);
-      if (isNaN(d.getTime())) {
-        // fallback: attempt to parse without timezone
-        const parts = isoOrNull.split('T');
-        if (parts.length > 1) {
-          const timePart = parts[1].split('+')[0].split('Z')[0];
-          const today = new Date();
-          const fallback = new Date(`${today.toISOString().split('T')[0]}T${timePart}`);
-          if (!isNaN(fallback.getTime())) {
-            return fallback.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-          }
-        }
-        return isoOrNull;
-      }
-      // Return time in user's locale, show hour:minute (AM/PM as per locale)
-      return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-    } catch {
-      return isoOrNull;
-    }
-  }
-
   prepareWeatherDetails(): void {
     if (!this.weatherData) return;
-
-    // Format sunrise/sunset to local friendly times
-    const formattedSunrise = this.formatTime(this.weatherData.sunrise);
-    const formattedSunset = this.formatTime(this.weatherData.sunset);
-    const humidity = this.weatherData.humidity !== null && this.weatherData.humidity !== undefined ? `${this.weatherData.humidity}%` : 'N/A';
-    const uv = this.weatherData.uvIndex !== null && this.weatherData.uvIndex !== undefined ? this.weatherData.uvIndex : 'N/A';
-
+    
     this.weatherDetails = [
       {
         label: 'Humidity',
-        value: humidity,
+        value: `${this.weatherData.humidity}%`,
         icon: 'opacity',
         iconClass: 'humidity-icon'
       },
@@ -171,19 +132,19 @@ export class WeatherComponent implements OnInit {
       },
       {
         label: 'UV Index',
-        value: uv,
+        value: this.weatherData.uvIndex,
         icon: 'wb_sunny',
         iconClass: 'uv-icon'
       },
       {
         label: 'Sunrise',
-        value: formattedSunrise,
+        value: this.weatherData.sunrise,
         icon: 'brightness_5',
         iconClass: 'sunrise-icon'
       },
       {
         label: 'Sunset',
-        value: formattedSunset,
+        value: this.weatherData.sunset,
         icon: 'brightness_4',
         iconClass: 'sunset-icon'
       }
@@ -195,9 +156,9 @@ export class WeatherComponent implements OnInit {
       this.chartData = [
         { name: 'Temperature (°C)', value: this.weatherData.temperature },
         { name: 'Feels Like (°C)', value: this.weatherData.feelsLike },
-        { name: 'Humidity (%)', value: this.weatherData.humidity ?? 0 },
+        { name: 'Humidity (%)', value: this.weatherData.humidity },
         { name: 'Wind (km/h)', value: this.weatherData.windSpeed },
-        { name: 'UV Index', value: this.weatherData.uvIndex ?? 0 },
+        { name: 'UV Index', value: this.weatherData.uvIndex },
       ];
     }
   }
@@ -206,7 +167,7 @@ export class WeatherComponent implements OnInit {
     if (!this.weatherData || !this.weatherData.description) {
       return '❓';
     }
-
+    
     const description = this.weatherData.description.toLowerCase();
     if (description.includes('clear')) return '☀️';
     if (description.includes('cloud')) return '☁️';
@@ -224,7 +185,7 @@ export class WeatherComponent implements OnInit {
     if (!this.weatherData || !this.weatherData.description) {
       return 'unknown-weather';
     }
-
+    
     const description = this.weatherData.description.toLowerCase();
     if (description.includes('clear')) return 'clear-weather';
     if (description.includes('cloud')) return 'cloudy-weather';
