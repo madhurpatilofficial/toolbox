@@ -132,7 +132,7 @@
 }
 
 .mat-mdc-raised-button:not(:disabled) {
-    color: var(--mdc-protected-button-label-text-color);
+    color: var(--mat-button-protected-label-text-color);
     margin-bottom: 21px;
 }
 
